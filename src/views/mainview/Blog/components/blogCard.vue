@@ -113,9 +113,9 @@
   // user info from store
   const userInfoStore = useUserInfoStore()
   const postUseravatar = computed(() => userInfoStore.userinfo.avatar)
-  const postUser = computed(() => ({
-	post.author,
-})) //动态更新用户
+//   const postUser = computed(() => ({
+// 	post.author,
+// })) //动态更新用户
   
   // parse tags
 //   const adminTags: AdminTag[] = post.adminTags ? JSON.parse(post.adminTags) : []
