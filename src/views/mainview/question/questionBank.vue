@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Search ,Edit,Delete} from '@element-plus/icons-vue'
+import { Search ,Edit,Delete,CircleCheckFilled} from '@element-plus/icons-vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import type { Question } from '@/lib/types';
@@ -10,8 +10,9 @@ import { MittRouterNameSpace } from "@/lib/type";
 import { judgerStore } from '@/stores/judgerStore';
 // import { useAuthStore } from '@/store/store';
 import { useUserInfoStore } from '@/stores/userInfo';
-import { countQuestion, getQuestionList, searchQuestion } from '@/api/question';
-
+import {  getQuestionList, searchQuestion } from '@/api/question';
+import { ta } from 'element-plus/es/locales.mjs';
+import { getSubmitList } from '@/api/submit';
 const userInfoStore = useUserInfoStore();
 const router = useRouter()
 // 统一导航栏的激活状态样式
@@ -30,20 +31,17 @@ const searchContent = ref("")
 const total_size = ref(0)
 // table加载状态
 const loading = ref(true)
-// 统计题目总数
-const count = async () => {
-  let result = await countQuestion();
-  total_size.value = result.data.total;
-  // console.log(result.data.total);
-  // console.log(total_size.value);
-  total_size.value = 100;
-};
-count();
-
+// //是否通过
+const isPass = ref(false)
+const ifPass = async (unique_id: string) => {
+  const res = await getSubmitList( unique_id, 1, 1)
+  if(res.data.status == "peding") return 
+  if(res.data.status == "accepted") isPass.value = true
+}
 // 题目列表
 const tableData = reactive({
-  question_list: [],
-  resolve_list: []
+  question_list: [] as Question[],
+  resolve_list: [] as any[]
 });
 
 // 跳转题目详情
@@ -63,11 +61,18 @@ const changePage = (new_page: number) => {
 // 加载题目列表
 const getQuestionListData = async () => {
   loading.value = true;
-  // let username = userInfoStore.isLogin ? userInfoStore.userinfo.username : "0";
-  let result = await getQuestionList(page.value,page_size);
+  const offset = (page.value - 1) * page_size;
+  let result = await getQuestionList(offset,page_size);
   loading.value = false;
-  tableData.question_list = result.data;
-  // console.log(tableData.question_list);
+  total_size.value = result.data.totalItems;
+  
+  // 转换 tag 字段
+  result.data.items = result.data.items.map((item:Question) => ({
+    ...item,
+    tag: item.tag ? item.tag.split(',').map(tag => tag.trim()) : [] // 将字符串转换为数组
+  }));
+  tableData.question_list = result.data.items;
+  // console.log(tableData.question_list[0].tag[0]);//打印出来是第一个字符m
 };
 getQuestionListData();
 
@@ -90,7 +95,7 @@ const searchQuestionData = async () => {
 </script>
 <template>
     <el-container>
-      <el-aside width="20%">
+      <el-aside width="10%">
   
       </el-aside>
       <el-container style="min-height: 105vh;">
@@ -109,34 +114,31 @@ const searchQuestionData = async () => {
             </el-input>
 
             <!-- 题目列表 -->
-            <el-table :data="tableData.question_list" style="width: 100%" v-loading="loading"
+            <el-table :data="tableData.question_list" style="width: 100%" v-loading="loading" table-layout="fixed"
               element-loading-text="加载中..." >
-              <el-table-column label="#" style="width: 10%;" #default="scope">
-                {{ scope.row.id }}
+              <el-table-column label="#" style="width: 10%;"  #default="scope">
+                {{ scope.row.ID }}
+                <el-icon v-if="ifPass(scope.row.unique_id),isPass.value==true"><CircleCheckFilled /></el-icon>
 
-                <el-popover placement="top-start" title="通过！" :width="200" trigger="hover" v-if="scope.row.uid == 1 " content="你已经成功征服这道题目=)">
-                  <template #reference>
-                    <icon-check-one theme="two-tone" size="23" :fill="['#333', '#7ed321']" :strokeWidth="2" />
-  
-                  </template>
-  
-                </el-popover>
               </el-table-column>
-  
-              <el-table-column label="题目" style="width: 70%;">
+              <el-table-column label="题目" style="width: 20%;">
                 <template #default="scope">
-                  <el-button type="primary" @click="toProblemDetail(scope.row)" link>{{ scope.row.questionName}}</el-button>
+                  <el-button type="primary" @click="toProblemDetail(scope.row)" link>{{ scope.row.title}}</el-button>
                 </template>
               </el-table-column>
+              <el-table-column label="标签" style="width: 50%;" #default="scope">
+                <el-tag v-for="tag in scope.row.tag" :key="tag" class="ml-2">{{ tag }}</el-tag>
+              </el-table-column>
               <el-table-column #default="scope" label="通过率" style="width: 10%;">
-                {{ scope.row.passRate  }} %
+                <!-- {{ scope.row.passRate  }} % -->
+                  100%
               </el-table-column>
               <el-table-column label="难度" style="width: 10%;">
                 <template #default="scope">
-                  <el-tag class="ml-2" v-show="scope.row.difficulty == '简单'">简单</el-tag>
-                  <el-tag class="ml-2" type="success" v-show="scope.row.difficulty == '中等'">中等</el-tag>
-                  <el-tag class="ml-2" type="warning" v-show="scope.row.difficulty == '困难'">困难</el-tag>
-                  <el-tag class="ml-2" type="danger" v-show="scope.row.difficulty == '噩梦'">噩梦</el-tag>
+                  <el-tag class="ml-2" v-show="scope.row.level == 1">简单</el-tag>
+                  <el-tag class="ml-2" type="success" v-show="scope.row.level == 2">中等</el-tag>
+                  <el-tag class="ml-2" type="warning" v-show="scope.row.level == 3">困难</el-tag>
+                  <el-tag class="ml-2" type="danger" v-show="scope.row.level == 4">噩梦</el-tag>
                 </template>
               </el-table-column>
             </el-table>
@@ -152,7 +154,7 @@ const searchQuestionData = async () => {
         <el-footer>
         </el-footer>
       </el-container>
-      <el-aside width="20%"></el-aside>
+      <el-aside width="10%"></el-aside>
     </el-container>
   </template>
     

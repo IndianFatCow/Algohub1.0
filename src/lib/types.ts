@@ -1,22 +1,18 @@
 export type Question = {//题目
-    questionName: string,
-    id:number,
-    inputStyle:string,
-    outputStyle:string,
-    inputSample:string,
-    outputSample:string,
-    dataRange:string,
-    difficulty:string,
-    timeLimit:number,
-    memoryLimit:number,
-    description:string,
-    totalPass:number,
-    totalAttempt:number,
-    resource:string,
-    tag:string,
-    passRate:number,
-    testSamples:TestSample
-}
+    "ID": number,
+    "instanceID": number,
+    "createdAt": string,
+    "updatedAt": string,
+    "DeletedAt": null,
+    "unique_id": string,
+    "title": string,
+    "descrition": string,
+    "author": string,
+    "time_limit": number,
+    "memory_limit": number,
+    "tag": string  //"math,test,example,easy",
+    "level": number,
+  }
 export interface userInfo {
     ID: number, // 修改了字段名从'id'到'ID'，类型从'string'改为'number'
     instanceID: number, // 新增字段

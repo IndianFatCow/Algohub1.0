@@ -7,11 +7,11 @@ import { useAuthStore } from '@/store/store'
 import { questionStore } from '@/stores/questionStore';
 import { reactive, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import aceEditor from './front/aceEditor.vue';
+import aceEditor from './aceEditor.vue';
 const props = defineProps(['uid', 'qid']);
 const AuthStore = useAuthStore()
 const uid = AuthStore.$state.user.id
-console.log("uid", uid);
+// console.log("uid", uid);
 console.log(AuthStore.$state.user);
 const qid = questionStore().$state.currentChoice.id
 const router = useRouter()
