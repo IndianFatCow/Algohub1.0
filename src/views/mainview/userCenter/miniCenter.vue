@@ -44,20 +44,13 @@ const router = useRouter();
 const tokenStore = useTokenStore()
 const userInfoStore = useUserInfoStore();
 const authStore = useAuthStore();
-console.log(userInfoStore.userinfo.avatar)
-const init_avatar =  () => {
-    // console.log(res)
-    let blob = userAvatarService(userInfoStore.userinfo.username)//获取用户头像
-    console.log('blob:::'+blob)
-    if(blob.status != 200) {
-        console.log('获取头像失败')
-        return
-    }
-    // const blob = new Blob([result], { type: 'image/png' });
-    console.log('blob is '+blob)
+// console.log(userInfoStore.userinfo.avatar)
+const init_avatar = async  () => {
+    let blob =await userAvatarService(userInfoStore.userinfo.username)//获取用户头像
+    console.log(blob)
+
     let img = URL.createObjectURL(blob)//将blob转换为url
-    // console.log(img)
-    UserInfoStore.updateAvatarFromBlob(img)//设置用户头像
+    userInfoStore.updateAvatarFromBlob(img)//设置用户头像
 }
 init_avatar()
 const handleCommand = (command) => {

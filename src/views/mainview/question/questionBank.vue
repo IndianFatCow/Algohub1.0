@@ -10,7 +10,7 @@ import { MittRouterNameSpace } from "@/lib/type";
 import { judgerStore } from '@/stores/judgerStore';
 // import { useAuthStore } from '@/store/store';
 import { useUserInfoStore } from '@/stores/userInfo';
-import {  getQuestionList, searchQuestion } from '@/api/question';
+import {  getQuestionList, searchQuestion,getQuestionById } from '@/api/question';
 import { ta } from 'element-plus/es/locales.mjs';
 import { getSubmitList } from '@/api/submit';
 const userInfoStore = useUserInfoStore();
@@ -83,6 +83,7 @@ const searchQuestionData = async () => {
       title: "error",
       message: "请输入搜索题目",
       type: 'error',
+      
     });
     getQuestionListData();
     return;

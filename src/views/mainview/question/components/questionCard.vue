@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
 const route = useRouter()
 // const from = route.query.from //判断用户是从 "题目列表" 还是 "提交记录" 进入
-const from = "questionBank" //测试用
+const from = (true)?"questionBank":"submitRecord" //测试用
 // console.log(from);
 // 当前题目选择存储
 const quesitonStore = questionStore()

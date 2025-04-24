@@ -42,7 +42,7 @@
 
         </transition>
 
-        <div class="bookmarklet" @click="toggleConfigPanel"></div>
+        <!-- <div class="bookmarklet" @click="toggleConfigPanel"></div> -->
     </div>
     <br>
     <el-row class="mb-9" v-show="!onlyrecord">
@@ -78,15 +78,14 @@
 </template>
   
  
-<script >
+
+<script>
 import ace from 'ace-builds'
 // 高亮
 import 'ace-builds/src-noconflict/snippets/c_cpp'
 import 'ace-builds/src-noconflict/snippets/python'
 import 'ace-builds/src-noconflict/snippets/golang'
 import 'ace-builds/src-noconflict/snippets/java'
-import 'ace-builds/src-noconflict/snippets/php'
-import 'ace-builds/src-noconflict/snippets/kotlin'
 // 主题
 import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/theme-monokai'
@@ -102,15 +101,16 @@ import 'ace-builds/src-noconflict/mode-python'
 import 'ace-builds/src-noconflict/mode-golang'
 import 'ace-builds/src-noconflict/mode-java'
 import 'ace-builds/src-noconflict/mode-php'
-import 'ace-builds/src-noconflict/mode-kotlin'
+// import 'ace-builds/src-noconflict/mode-kotlin'
 
-import { Promotion } from '@element-plus/icons-vue'
+import { Promotion, TurnOff } from '@element-plus/icons-vue'
 import { ref, defineProps } from 'vue'
 import request from '@/utils/request';
 import { ElNotification } from 'element-plus'
-import { useAuthStore } from '@/store/store'
+import { useUserInfoStore } from '@/stores/userInfo'
 import { judgerStore } from '@/stores/judgerStore'
 import { questionStore } from '@/stores/questionStore'
+import { debugSubmit,submitCode} from '@/api/submit'
 
 import {
     Document,
@@ -123,7 +123,7 @@ import {
     FolderAdd,
     Setting,
 } from '@element-plus/icons-vue'
-import { socket } from '@/plugins/socket'
+// import { socket } from '@/plugins/socket'
 
 
 //  主题
@@ -161,38 +161,47 @@ const wrapArray = [{
 }]
 // 高亮、代码提示
 const modeArray = [{
-    name: 'Cpp_C',
+    name: 'C++',
     path: 'ace/mode/c_cpp'
-}, {
+},{
+    name: 'C',
+    path: 'ace/mode/c_cpp'
+},
+ {
     name: 'Python',
     path: 'ace/mode/python'
 }, {
     name: 'Java',
     path: 'ace/mode/java'
-},{
+}, {
     name: 'Go',
     path: 'ace/mode/golang'
-}, {
-    name: 'Kotlin',
-    path: 'ace/mode/kotlin'
-}, {
+},{
     name: 'PHP',
-    path: 'ace/mode/PHP'
-}]
+    path: 'ace/mode/php'
+}
+]
 
+/**
+ * , {
+    name: 'Go',
+    path: 'ace/mode/golang'
+}, 
+ */
 export default {
     setup(props) {
         let isError = ref(false)
+        let errorMsg = ref('')
         let input = ref("还没有输入")
         let output = ref("没有代码运行")
         let answer = ref("没有代码运行")
-        let isCorrect = ref(false)
-        let underMessage = ref('')
-        let submiting = ref(false)
+        let isCorrect = ref(false) // 是否正确
+        let underMessage = ref('') //  提交信息
+        let submiting = ref(false) // 提交中
 
-        let uid = ref(useAuthStore().$state.user.id)
-        let userName = ref(useAuthStore().$state.user.nickName)
-        let qid = ref(questionStore().$state.currentChoice.id)
+        // let uid = ref(useAuthStore().$state.user.id)
+        // let userName = ref(useAuthStore().$state.user.nickName)
+        let qid = ref(questionStore().$state.currentChoice.unique_id)
         let questionName = ref(questionStore().$state.currentChoice.questionName)
         //      代码编译类型 = 比赛:101 , 普通:100
         let type = ref(judgerStore().$state.type)
@@ -203,15 +212,15 @@ export default {
         let showProcess = ref(false)
 
         // webcoket
-        socket.ws_url = socket.base_url + "?id=" + uid.value
-        socket.init()
-        socket.websock.onmessage = function reacevie(e) {
-            let state = JSON.parse(e.data);
+        // socket.ws_url = socket.base_url + "?id=" + uid.value
+        // socket.init()
+        // socket.websock.onmessage = function reacevie(e) {
+        //     let state = JSON.parse(e.data);
 
-            let index = state.code
-            infoIndex.value = index
-            stepInfoMsg.value[index - 1] = stepDoneMsg.value[index - 1]
-        }
+        //     let index = state.code
+        //     infoIndex.value = index
+        //     stepInfoMsg.value[index - 1] = stepDoneMsg.value[index - 1]
+        // }
         const onlyrecord = ref(false)
 
         const mode = ref(props.mode)
@@ -224,7 +233,7 @@ export default {
             // 从查看记录的方式进入的
             onlyrecord.value = true
             console.log('title',title.value);
-            if(title.value == "WrongAnswer"){
+            if(title.value == "WrongAnswer"){ // 错误答案
                 isError = true
                 
                 console.log('ace---testSample',testSample.value.input);
@@ -244,9 +253,7 @@ export default {
             submiting,
             isCorrect,
             underMessage,
-            uid,
             qid,
-            userName,
             questionName,
             infoIndex,
             stepInfoMsg,
@@ -258,14 +265,14 @@ export default {
         }
     },
     props: {
-        uid: Number,
-        qid: String,
-        userName: String,
-        questionName: String,
-        mode: String,
-        code: String,
-        testSample:Object,
-        title: String
+        type: Number, // 代码编译类型
+        mode: String, // 代码编译类型
+        qid: String, // 题目id
+        userName: String, // 用户名
+        questionName: String, // 题目名称
+        code: String, // 编译语言
+        testSample:Object, // 测试样例
+        title: String  // 题目名称
     },
     mounted() {
         // 初始化aceEditor
@@ -296,7 +303,7 @@ export default {
             fontSize: 14,
             themePath: 'ace/theme/monokai',
             modePath: 'ace/mode/c_cpp',
-            modeName: 'Cpp_c',
+            modeName: 'Cpp',
             modeArray: modeArray,
             wrapArray: wrapArray,
             themeArray: themeArray
@@ -304,77 +311,82 @@ export default {
     },
     methods: {
         // 提交请求
-        judge() {
-            let varnow = Date.now()
-            let varlast = judgerStore().$state.lasttime
-            if ((varnow - varlast) < 8000) {
+        async judge () {
+            let varnow = Date.now() // 当前时间
+            let varlast = judgerStore().$state.lasttime // 上次提交时间
+            if ((varnow - varlast) < 3000) {  // 8秒内禁止提交
                 ElNotification({
                     title: "禁止的操作",
-                    message: "歇一会吧,服务器要爆炸了=)",
+                    message: "请勿频繁提交代码",
                     type: 'error',
                 })
                 return
             }
             judgerStore().setLastTime(Date.now())
-            this.showProcess = ref(true)
-            this.isError = false
-            this.submiting = true
+            // this.showProcess = ref(true)  // 显示进度条
+            this.isError = false // 隐藏错误提示
+            this.submiting = true // 提交中
             // 提交内容
             console.log(this.type);
             let judgeData = {
                 code: this.aceEditor.getSession().getValue(),
-                uid: this.uid,
                 qid: this.qid,
-                userName: this.userName,
-                questionName: this.questionName,
                 language: this.modeName,
-                type: this.type,
+                cases:[]
+            }
+            if( judgeData.code == "" || judgeData.code == undefined){
+                ElNotification({
+                    title: "发生了一些错误!",
+                    message: "请先输入代码",
+                    type: 'error',
+                })
+                this.submiting = false
+                return;
             }
             // 发送判题请求
-            request({
-                url: '/judge',
-                data: judgeData,
-                method: 'post'
-            }).then((res) => {
-                this.submiting = false
-                if (res == undefined) {
-                    return;
-                }
-                if (res.data.state != 40002) {
-                    // 重新加载编译记录
-                    emitter.emit('loadRecord')
-                }
-                if(res.data.state == 40000){
-                    ElNotification({
-                        title: "发生了一些错误!",
-                        message: res.data.message,
-                        type: 'error',
-                    })
-                    return;
-                }
-                ElNotification({
-                    title: res.data.data.title,
-                    message: res.data.data.message,
-                    type: res.data.data.pass ? 'success' : 'error',
-                })
-
-                this.underMessage = ref(res.data.data.message)
-                if (!res.data.data.pass) {
-                    // 失败
-                    this.isCorrect = false
-                    this.isError = true
-                    this.input = res.data.data.testSample == null ? " " : res.data.data.testSample.input
-                    this.output = res.data.data.testSample == null ? " " : res.data.data.testSample.userOutput
-                    this.answer = res.data.data.testSample == null ? " " : res.data.data.testSample.output
-                } else {
-                    // 成功
-                    this.infoIndex = 5
-                    this.stepInfoMsg[4] = this.stepDoneMsg[4]
-                    this.isCorrect = true
-                    this.isError = false
-                }
-            }, (reason) => {
+            // console.log(judgeData);
+            const res =await submitCode(judgeData.qid,judgeData.code,judgeData.language)
+            console.log(res);
+            const isPass = res.data.status == 'ACCEPTED' ? true : false
+            this.submiting = false // 提交完成
+            if (res == undefined) {
+                return;
+            }
+            if(res.data.status == 'RUNTIME_ERROR'){}
+            // if (res.data.state != 40002) {
+            //     // 重新加载编译记录
+            //     emitter.emit('loadRecord')
+            // }
+            // if(res.data.state == 40000){
+            //     ElNotification({
+            //         title: "发生了一些错误!",
+            //         message: res.data.message,
+            //         type: 'error',
+            //     })
+            //     return;
+            // }
+            ElNotification({
+                title: res.data.status,
+                message: res.data.message? res.data.message : res.data.status,
+                type: isPass ? 'success' : 'error',
             })
+
+            this.underMessage = ref(res.data.message? res.data.message : res.data.status)
+            if (!isPass) {
+                // 失败
+                this.isCorrect = false
+                this.isError = true
+                this.errorMsg = res.data.details
+                this.input = res.data.input == null ? " " : res.data.data.testSample.input
+                this.output = res.data.testSample == null ? " " : res.data.data.testSample.userOutput
+                this.answer = res.data.data.testSample == null ? " " : res.data.data.testSample.output
+            } else {
+                // 成功
+                // this.infoIndex = 5
+                // this.stepInfoMsg[4] = this.stepDoneMsg[4]
+                this.isCorrect = true
+                this.isError = false
+            }
         },
         // 弹出设置窗口
         toggleConfigPanel() {
@@ -405,6 +417,7 @@ export default {
 
 
 </script>
+  
   
 <style lang='scss' scoped>
 .ace-container {

@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 import { ref } from 'vue'
 import request from '@/utils/request';
@@ -9,50 +8,40 @@ import { reactive, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import aceEditor from './aceEditor.vue';
 const props = defineProps(['uid', 'qid']);
-const AuthStore = useAuthStore()
-const uid = AuthStore.$state.user.id
+
 // console.log("uid", uid);
-console.log(AuthStore.$state.user);
-const qid = questionStore().$state.currentChoice.id
+const qid = questionStore().$state.currentChoice.unique_id
 const router = useRouter()
-const dialogVisible = ref(false)
-const loadingRecord = ref(true)
-useAuthStore()
-onMounted(() => {
+const dialogVisible = ref(false)//弹窗是否显示
+const loadingRecord = ref(true)//加载状态
 
-    emitter.on('loadRecord', () => {
-        
-        
-        // 用户登录的情况下得到他这道题目的编译记录
-        const url = ref("/getSubmitRecords/" + uid + "/" + qid + "/1")
+import { getSubmitList } from '@/api/submit';
+onMounted( () => {
 
-        console.log("uid", props.uid);
-
-        request({
-            url: url.value,
-            method: 'get'
-        }).then((res) => {
-            tableData.record_list = res.data.data
-        })
-
+    emitter.on('loadRecord',async () => {
+        console.log("qid    ", qid);
+        const res = await getSubmitList(qid)
+        tableData.record_list = res.data
+        console.log(res.data);
     });
 })
 
-const recorddetial = ref({
-    code: '',
-    qid: 0,
-    language: '',
-    memory: 0,
-    message: '',
-    questionName: '',
-    submitTime: '',
-    testSample: '',
-    time: 0,
-    title: '',
-    userName: '',
-    uid: 0,
-})
 
+const recorddetial = ref({
+    ID: 1,
+    instanceID: 1,
+    createdAt: "",
+    updatedAt: "",
+    DeletedAt: null,
+    code_text: "int add(int a, int b) { return a + b; }",
+    language: "cpp",
+    problem_id: "aPlusb",
+    status: "pending",
+    author: "normal",
+    excute_time: 0,
+    excute_memory: 0,
+    testSample: "1 2",
+})
 const showRecordDetial = (detial: any) => {
     console.log(detial);
     recorddetial.value = detial
@@ -64,32 +53,12 @@ const showRecordDetial = (detial: any) => {
 const tableData = reactive({
     record_list: []
 })
-const loadRecord = () => {
+const loadRecord =async () => {
     
-    let url = "/getSubmitRecords/" + uid + "/" + qid + "/1"
-    if (props.uid == undefined) {
-        // 没登陆
-        return
-    }
-    if(props.qid == undefined){
-        // 在个人中心
-        url = "/getSubmitRecordsWithUid/" + uid + "/1"
-    }
-    if(props.uid == 'detial'){
-        // 在题目详情页面
-        url = "/getSubmitRecords/" + uid + "/" + qid + "/1"
-    }
-
+    const res = await getSubmitList(qid)
+    tableData.record_list = res.data.data
+    loadingRecord.value = false
     
-
-
-    request({
-        url: url,
-        method: 'get'
-    }).then((res) => {
-        tableData.record_list = res.data.data
-        loadingRecord.value = false
-    })
 }
 loadRecord()
 const toProblemDetial = (question: any) => {
@@ -113,8 +82,8 @@ const toProblemDetial = (question: any) => {
 
         <el-table-column #default="scope" label="状态" style="width: 20%;">
 
-            <el-tag v-show="scope.row.title == 'Accept'" type="success" disabled plain>Accept</el-tag>
-            <el-tag v-show="scope.row.title != 'Accept'" type="danger" disabled plain>{{ scope.row.title }}</el-tag>
+            <el-tag v-show="scope.row.status == 'Accept'" type="success" disabled plain>Accept</el-tag>
+            <el-tag v-show="scope.row.status != 'Accept'" type="danger" disabled plain>{{ scope.row.title }}</el-tag>
 
         </el-table-column>
 
@@ -124,28 +93,28 @@ const toProblemDetial = (question: any) => {
     </el-table>
 
     <el-dialog v-model="dialogVisible" title="编译记录详情" width="50%" destroy-on-close   v-if="dialogVisible" :visible.sync="dialogVisible">
-        <el-descriptions :title="'No.' + recorddetial.qid" :column="3" border>
+        <el-descriptions :title="'No.' + recorddetial.ID" :column="3" border>
             <el-descriptions-item label="題目名" label-align="right" align="center" label-class-name="my-label"
-                class-name="my-content" width="150px">{{ recorddetial.questionName }}</el-descriptions-item>
-            <el-descriptions-item label="时间" label-align="right" align="center">{{ recorddetial.time }} ms</el-descriptions-item>
-            <el-descriptions-item label="空间" label-align="right" align="center">{{ recorddetial.memory }} mb</el-descriptions-item>
+                class-name="my-content" width="150px">{{ recorddetial.problem_id }}</el-descriptions-item>
+            <el-descriptions-item label="时间" label-align="right" align="center">{{ recorddetial.excute_time }} ms</el-descriptions-item>
+            <el-descriptions-item label="空间" label-align="right" align="center">{{ recorddetial.excute_memory }} mb</el-descriptions-item>
 
             <el-descriptions-item label="状态" label-align="right" align="center">
-                <el-tag v-show="recorddetial.title == 'Accept'" type="success" disabled plain>Accept</el-tag>
-                <el-tag v-show="recorddetial.title != 'Accept'" type="danger" disabled plain>{{ recorddetial.title }}</el-tag>
+                <el-tag v-show="recorddetial.problem_id == 'Accept'" type="success" disabled plain>Accept</el-tag>
+                <el-tag v-show="recorddetial.problem_id != 'Accept'" type="danger" disabled plain>{{ recorddetial.problem_id }}</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="语言" label-align="right" align="center">
                 {{ recorddetial.language }}
             </el-descriptions-item>
             <el-descriptions-item label="提交日期" label-align="right" align="center">
-                {{ recorddetial.submitTime }}
+                {{ recorddetial.createdAt }}
             </el-descriptions-item>
             <el-descriptions-item label="信息"   label-align="right" align="center">
-                <el-alert :title="recorddetial.message" :type="recorddetial.title == 'Accept' ? 'success' : 'error'" :closable="false" />
+                <el-alert  :type="recorddetial.status == 'Accept' ? 'success' : 'error'" :closable="false" />
             </el-descriptions-item>
         </el-descriptions>
         <br/>
-        <aceEditor :mode="'test'" :code="recorddetial.code" :testSample="recorddetial.testSample" :title="recorddetial.title"/>
+        <aceEditor :mode="'test'" :code="recorddetial.code_text" :testSample="recorddetial.testSample" :title="recorddetial.status"/>
         <template #footer>
             <span class="dialog-footer">
 

@@ -2,16 +2,16 @@ import { io } from "socket.io-client";
 
 // WebSocket 配置
 const socket = {
-  websock: null as WebSocket | null,
-  ws_url: "wss://www.nextstepcode.club/ws",
-  socket_open: false,
-  hearbeat_timer: null as any,
-  hearbeat_interval: 5000,
-  is_reonnect: true,
-  reconnect_count: 3,
-  reconnect_current: 1,
-  reconnect_timer: null as any,
-  reconnect_interval: 3000,
+  websock: null as WebSocket | null, // WebSocket 实例
+  ws_url: "wss://www.nextstepcode.club/ws", // WebSocket 服务器地址
+  socket_open: false, // 是否连接成功 
+  hearbeat_timer: null as any,  // 心跳定时器
+  hearbeat_interval: 5000,  // 心跳间隔时间
+  is_reonnect: true,  // 是否允许重连
+  reconnect_count: 3, // 重连次数
+  reconnect_current: 1, // 当前重连次数
+  reconnect_timer: null as any, // 重连定时器
+  reconnect_interval: 3000, // 重连间隔时间
 
   /**
    * 初始化 WebSocket 连接
