@@ -1,5 +1,5 @@
 <template>
-  <el-container class="welcome-container">
+  <el-container class="welcome-container" width="100%">
     <el-main>
       <section class="hero-section">
         <div class="content">

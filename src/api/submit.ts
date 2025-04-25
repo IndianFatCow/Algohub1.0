@@ -21,3 +21,8 @@ export function debugSubmit(problem_id: string, code: string, language: string, 
     cases,
   });
 }
+
+//获取测试案例
+export function getSolution(problem_id:string){
+  return request.get(`/problem/${{problem_id}}/solution`)
+}

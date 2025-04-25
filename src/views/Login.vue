@@ -3,7 +3,7 @@ import { User, Lock,Message } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 //控制注册与登录表单的显示， 默认显示注册
-const isRegister = ref(true)//true默认显示注册
+const isRegister = ref(false)//true默认显示注册
 const showForgetPwdDialog = ref(false)//忘记密码对话框
 
 //忘记密码

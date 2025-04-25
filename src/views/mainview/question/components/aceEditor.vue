@@ -46,7 +46,7 @@
     </div>
     <br>
     <el-row class="mb-9" v-show="!onlyrecord">
-        <el-button type="success" @click="isDebug=true">调试代码</el-button>
+        <el-button type="success" @click="beforeDebug">调试代码</el-button>
         <el-button type="success" @click="judge" :loading="submiting" style="float: left;"><icon-upload-logs theme="two-tone" size="24" :fill="['#ffffff' ,'#ffffff']"/> &nbsp; 提交代码</el-button>
         
         <!-- <el-steps v-show="showProcess" :space="200" :active="infoIndex" finish-status="success" style="width: 80%;"
@@ -99,7 +99,7 @@
  
 
 <script>
-import ace from 'ace-builds'
+import ace, { Editor } from 'ace-builds'
 // 高亮
 import 'ace-builds/src-noconflict/snippets/c_cpp'
 import 'ace-builds/src-noconflict/snippets/python'
@@ -129,7 +129,8 @@ import { ElNotification } from 'element-plus'
 import { useUserInfoStore } from '@/stores/userInfo'
 import { judgerStore } from '@/stores/judgerStore'
 import { questionStore } from '@/stores/questionStore'
-import { debugSubmit,submitCode} from '@/api/submit'
+import { debugSubmit,submitCode , getSolution} from '@/api/submit'
+import { useCodeStore } from '@/stores/codeStore'
 
 import {
     Document,
@@ -213,8 +214,8 @@ export default {
         let submitError = ref(false) // 提交错误
         // let errorMsg = ref('')
         let isDebug = ref(false) // 是否调试
-        let input = ref("5 5")
-        let output = ref("10")
+        let input = ref("")
+        let output = ref("")
         let answer = ref("")
         let isCorrect = ref(false) // 是否正确
         let underMessage = ref('') //  提交信息
@@ -246,7 +247,6 @@ export default {
 
         const mode = ref(props.mode)
         const code = ref(props.code)
-
         if (mode.value != 'normal') {
             const testSample = ref(JSON.parse(props.testSample))
             const title = ref(props.title)
@@ -303,7 +303,7 @@ export default {
             maxLines: 35,
             minLines: 30,
             fontSize: 14,
-            value: this.code ? this.code : '',
+            value: useCodeStore().$state.code ? useCodeStore().$state.code : '',
             theme: this.themePath,
             mode: this.modePath,
             wrap: this.wrap,
@@ -315,7 +315,13 @@ export default {
             enableLiveAutocompletion: true,
             enableBasicAutocompletion: true
         })
-        this.aceEditor.getSession().on('change', this.change)
+        // this.aceEditor.getSession().on('change', this.change)
+          // 直接在监听器内部处理变更
+        this.aceEditor.getSession().on('change', (e) => {
+            const newCode = this.aceEditor.getValue();
+            useCodeStore().setCode(newCode); // 更新本地存储
+            console.log("代码已更新并保存到本地存储");
+        });
     },
     data() {
         return {
@@ -333,6 +339,14 @@ export default {
         }
     },
     methods: {
+        //准备调试
+        async beforeDebug (){
+            this.isDebug=true;
+            const res = await getSolution(this.qid )
+            this.input = res.data.data_test == null ? "示例输入 " : res.data.data_test
+            this.output = res.data.result_test == null ? "" : res.data.result_test
+
+        },
         // 调试代码
         async debug () {
             let varnow = Date.now() // 当前时间

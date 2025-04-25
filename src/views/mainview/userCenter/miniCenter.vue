@@ -47,7 +47,7 @@ const authStore = useAuthStore();
 // console.log(userInfoStore.userinfo.avatar)
 const init_avatar = async  () => {
     let blob =await userAvatarService(userInfoStore.userinfo.username)//获取用户头像
-    console.log(blob)
+    // console.log(blob)
 
     let img = URL.createObjectURL(blob)//将blob转换为url
     userInfoStore.updateAvatarFromBlob(img)//设置用户头像
