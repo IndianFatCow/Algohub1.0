@@ -11,11 +11,11 @@
                 <div>
                     <div class="item">
                         <label class="title">语言</label>
-                        <el-select class="value" v-model="modePath" @change="handleModelPathChange" size="default"
-                            value-key="name">
-                            <el-option v-for="mode in modeArray" :key="mode.name" :label="mode.name" :value="mode.path">
-                            </el-option>
-                        </el-select>
+                    <el-select class="value" v-model="modeName" @change="handleModelNameChange" size="default">
+                        <el-option v-for="mode in modeArray" :key="mode.name" :label="mode.name" :value="mode.name">
+                        </el-option>
+                    </el-select>
+
                     </div>
                     <div class="item">
                         <label class="title">主题</label>
@@ -46,16 +46,17 @@
     </div>
     <br>
     <el-row class="mb-9" v-show="!onlyrecord">
+        <el-button type="success" @click="isDebug=true">调试代码</el-button>
         <el-button type="success" @click="judge" :loading="submiting" style="float: left;"><icon-upload-logs theme="two-tone" size="24" :fill="['#ffffff' ,'#ffffff']"/> &nbsp; 提交代码</el-button>
-        <!-- <el-button type="success">运行测试</el-button> -->
-        <el-steps v-show="showProcess" :space="200" :active="infoIndex" finish-status="success" style="width: 80%;"
+        
+        <!-- <el-steps v-show="showProcess" :space="200" :active="infoIndex" finish-status="success" style="width: 80%;"
             :align-center="true">
             <el-step :title="stepInfoMsg[0]" />
             <el-step :title="stepInfoMsg[1]" />
             <el-step :title="stepInfoMsg[2]" />
             <el-step :title="stepInfoMsg[3]" />
             <el-step :title="stepInfoMsg[4]" />
-        </el-steps>
+        </el-steps> -->
     </el-row>
     <br>
     <!-- 提示 -->
@@ -63,18 +64,36 @@
     <el-alert v-show="isCorrect" :title="underMessage" type="success" :closable="false" />
     <br>
     <!-- 错误数据提示 -->
-    <el-card class="box-card" v-show="isError">
+    <el-card class="box-card" v-show="submitError" style="width: 100%;margin-top: 10px;">
         <template #header>
-            <div class="card-header">
-                <span>错误数据如下</span>
-            </div>
+        <div class="card-header">
+            <span>错误数据如下</span>
+        </div>
         </template>
-        输入 : <br> <el-alert :title="input" type="info" :closable="false"
-            style="margin-bottom: 10px;white-space: pre-wrap;" />
-        输出 : <el-alert :title="output" type="info" :closable="false" style="margin-bottom: 10px;white-space: pre-wrap;" />
-        答案 : <el-alert :title="answer" type="info" :closable="false"
-            style="margin-bottom: 10px;white-space: pre-wrap;" /><br><br>
+        输入 : <br>
+        <el-alert :title="input" type="info" :closable="false" style="margin-bottom: 10px;white-space: pre-wrap;" />
+        输出 : 
+        <el-alert :title="output" type="info" :closable="false" style="margin-bottom: 10px;white-space: pre-wrap;" />
+        答案 : 
+        <el-alert :title="answer" type="info" :closable="false" style="margin-bottom: 10px;white-space: pre-wrap;" /><br><br>
     </el-card>
+    <el-card class="box-card" v-show="isDebug" style="width: 100%;margin-top: 10px;">
+        <template #header>
+        <div class="card-header">
+            <span>手动输入输出</span>
+        </div>
+        </template>
+        <span>输入</span>
+        <el-input type="textarea" :rows="1" v-model="input" placeholder="请输入调试数据"></el-input>
+        <span>预计输出</span>
+        <el-input type="textarea" :rows="1" v-model="output" placeholder="请输入预计输出"></el-input>
+        <div>
+            <span>实际输出</span>
+            <el-input type="textarea" :rows="1" v-model="answer"></el-input>
+        </div>
+        <el-button  @click="debug" :loading="submiting" style="float: right;"type="primary" plain>点击提交</el-button>
+        <span>  </span>
+  </el-card>
 </template>
   
  
@@ -161,7 +180,7 @@ const wrapArray = [{
 }]
 // 高亮、代码提示
 const modeArray = [{
-    name: 'C++',
+    name: 'Cpp',
     path: 'ace/mode/c_cpp'
 },{
     name: 'C',
@@ -191,10 +210,12 @@ const modeArray = [{
 export default {
     setup(props) {
         let isError = ref(false)
-        let errorMsg = ref('')
-        let input = ref("还没有输入")
-        let output = ref("没有代码运行")
-        let answer = ref("没有代码运行")
+        let submitError = ref(false) // 提交错误
+        // let errorMsg = ref('')
+        let isDebug = ref(false) // 是否调试
+        let input = ref("5 5")
+        let output = ref("10")
+        let answer = ref("")
         let isCorrect = ref(false) // 是否正确
         let underMessage = ref('') //  提交信息
         let submiting = ref(false) // 提交中
@@ -237,9 +258,9 @@ export default {
                 isError = true
                 
                 console.log('ace---testSample',testSample.value.input);
-                input = testSample.value.input == "" ?  "还没有输入" : testSample.value.input 
-                output = testSample.value.output == "" ?  "还没有输出" : testSample.value.output 
-                answer = testSample.value.userOutput == "" ?  "没有标准答案" : testSample.value.userOutput 
+                // this.input = res.data.input == null ? "示例输入 " : res.data.data.testSample.input
+                this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
+                this.answer = res.data.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output
             }else{
                 isError = false
             }
@@ -249,7 +270,9 @@ export default {
             input,
             output,
             answer,
+            submitError,
             isError,
+            isDebug,
             submiting,
             isCorrect,
             underMessage,
@@ -310,6 +333,70 @@ export default {
         }
     },
     methods: {
+        // 调试代码
+        async debug () {
+            let varnow = Date.now() // 当前时间
+            let varlast = judgerStore().$state.lasttime // 上次提交时间
+            if ((varnow - varlast) < 3000) {  // 8秒内禁止提交
+                ElNotification({
+                    title: "禁止的操作",
+                    message: "请勿频繁提交代码",
+                    type: 'error',
+                })
+                return
+            }
+            judgerStore().setLastTime(Date.now())
+            // this.showProcess = ref(true)  // 显示进度条
+            this.isError = false // 隐藏错误提示
+            this.submiting = true // 提交中
+            let judgeData = {
+                code: this.aceEditor.getSession().getValue(),
+                qid: this.qid,
+                language: this.modeName,
+                cases: [{
+                    input: this.input,
+                    expected_output: this.output
+                }]
+            }
+            if( judgeData.code == "" || judgeData.code == undefined){
+                ElNotification({
+                    title: "发生了一些错误!",
+                    message: "请先输入代码",
+                    type: 'error',
+                })
+                this.submiting = false
+                return;
+            }
+            // 发送判题请求
+            console.log(judgeData);
+            const res =await debugSubmit(judgeData.qid,judgeData.code,judgeData.language,judgeData.cases)
+            console.log(res.data.case_info);
+            const isPass = res.data.status == 'ACCEPTED' ? true : false
+            this.submiting = false // 提交完成
+            if (res == undefined) {
+                return;
+            }
+            ElNotification({
+                title: res.data.status,
+                message: res.data.message? res.data.message : res.data.status,
+                type: isPass ? 'success' : 'error',
+            })
+
+            this.underMessage = ref(res.data.message? res.data.message : res.data.status)
+            if (!isPass) {
+                // 失败
+                this.isCorrect = false
+                this.isError = true
+                this.errorMsg = res.data.details
+                // this.input = res.data.input == null ? "示例输入 " : res.data.data.testSample.input
+                this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
+                this.answer = res.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output
+            } else {
+                // 成功
+                this.isCorrect = true
+                this.isError = false
+            }
+        },
         // 提交请求
         async judge () {
             let varnow = Date.now() // 当前时间
@@ -325,14 +412,14 @@ export default {
             judgerStore().setLastTime(Date.now())
             // this.showProcess = ref(true)  // 显示进度条
             this.isError = false // 隐藏错误提示
+            this.isDebug = false // 隐藏调试
             this.submiting = true // 提交中
             // 提交内容
-            console.log(this.type);
+            // console.log(this.type);
             let judgeData = {
                 code: this.aceEditor.getSession().getValue(),
                 qid: this.qid,
                 language: this.modeName,
-                cases:[]
             }
             if( judgeData.code == "" || judgeData.code == undefined){
                 ElNotification({
@@ -344,7 +431,7 @@ export default {
                 return;
             }
             // 发送判题请求
-            // console.log(judgeData);
+            console.log(judgeData);
             const res =await submitCode(judgeData.qid,judgeData.code,judgeData.language)
             console.log(res);
             const isPass = res.data.status == 'ACCEPTED' ? true : false
@@ -353,18 +440,6 @@ export default {
                 return;
             }
             if(res.data.status == 'RUNTIME_ERROR'){}
-            // if (res.data.state != 40002) {
-            //     // 重新加载编译记录
-            //     emitter.emit('loadRecord')
-            // }
-            // if(res.data.state == 40000){
-            //     ElNotification({
-            //         title: "发生了一些错误!",
-            //         message: res.data.message,
-            //         type: 'error',
-            //     })
-            //     return;
-            // }
             ElNotification({
                 title: res.data.status,
                 message: res.data.message? res.data.message : res.data.status,
@@ -376,10 +451,11 @@ export default {
                 // 失败
                 this.isCorrect = false
                 this.isError = true
+                this.submitError = true
                 this.errorMsg = res.data.details
-                this.input = res.data.input == null ? " " : res.data.data.testSample.input
-                this.output = res.data.testSample == null ? " " : res.data.data.testSample.userOutput
-                this.answer = res.data.data.testSample == null ? " " : res.data.data.testSample.output
+                // this.input = res.data.input == null ? "示例输入 " : res.data.data.testSample.input
+                this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
+                this.answer = res.data.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output
             } else {
                 // 成功
                 // this.infoIndex = 5
@@ -397,9 +473,26 @@ export default {
         },
         // 改变代码补全
         handleModelPathChange(modelPath) {
+            
             this.aceEditor.getSession().setMode(modelPath)
             this.modeName = modelPath.split('/')[2]
         },
+        // handleModelChange(modeName) {
+        // // 找到对应的path
+        // const selectedMode = this.modeArray.find(mode => mode.name === modeName);
+        // if (selectedMode) {
+        //     this.aceEditor.getSession().setMode(selectedMode.path);
+        //     this.modeName = modeName; // 直接设置模式名称
+        // }
+        // },
+        handleModelNameChange(name) {
+            const selected = this.modeArray.find(m => m.name === name)
+            if (selected) {
+                this.modePath = selected.path
+                this.aceEditor.getSession().setMode(this.modePath)
+            }
+        },
+
         // 换行
         handleWrapChange(wrap) {
             this.aceEditor.getSession().setUseWrapMode(wrap)
@@ -459,6 +552,38 @@ export default {
         border-image: initial;
     }
 
+}
+.box-card {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+  font-size: 14px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 改善.el-alert样式 */
+.box-card .el-alert {
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 13px;
+}
+
+/* 给输入、输出、答案前的文本添加一些样式 */
+.box-card {
+  line-height: 1.6;
+}
+
+.box-card br + span {
+  margin-left: 10px;
+  color: #666;
+  font-weight: 500;
 }
 
 //开始过度

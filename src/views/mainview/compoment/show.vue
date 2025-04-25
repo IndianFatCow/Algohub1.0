@@ -35,7 +35,7 @@ const goToCode = () => {
 
 <style scoped>
 .welcome-container {
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
   align-items: center;
   justify-content: center;

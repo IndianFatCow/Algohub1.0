@@ -32,7 +32,6 @@ import userInfovue from '@/views/admin/userCenter/UserInfo.vue'
 import userResetpasswordvue from '@/views/admin/userCenter/UserResetPassword.vue'//修改密码
 
 import setupAllRouterGuard from './listen'//监听路由
-import { hi } from 'element-plus/es/locales.mjs'
 //定义路由关系
 const routes = [
     { path: '/login', component: LoginVue },    
