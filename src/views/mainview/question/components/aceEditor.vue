@@ -343,8 +343,9 @@ export default {
         async beforeDebug (){
             this.isDebug=true;
             const res = await getSolution(this.qid )
-            this.input = res.data.data_test == null ? "示例输入 " : res.data.data_test
-            this.output = res.data.result_test == null ? "" : res.data.result_test
+            console.log(res);
+            this.input = res.data.items[0].data_test == null ? "示例输入 " : res.data.items[0].data_test
+            this.output = res.data.items[0].result_test == null ? "" : res.data.items[0].result_test
 
         },
         // 调试代码
@@ -403,7 +404,7 @@ export default {
                 this.isError = true
                 this.errorMsg = res.data.details
                 // this.input = res.data.input == null ? "示例输入 " : res.data.data.testSample.input
-                this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
+                // this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
                 this.answer = res.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output
             } else {
                 // 成功
