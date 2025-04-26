@@ -135,7 +135,7 @@
                                 <span class="text-md mx-1" :style="{ color: starColor[0] }">{{ blog?.star }}</span>
                             </div>
                             <!-- 删除 -->
-                            <div v-show="userStore().$state.user.id == blog?.user.id" @click="removeBlog"
+                            <div v-show="useUserInfoStore().$state.user.id == blog?.user.id" @click="removeBlog"
                                 class="cursor-pointer text-center text-md justify-center items-center flex "
                                 style="float: left;margin: 33px 10px 20px 0px;"
                                 @mouseleave="deleteColor = ['#9b9b9b', '#ffffff']"
@@ -172,7 +172,7 @@
 
                 </el-card>
                 <!-- 评论卡片 -->
-                <commentsCard v-for="comments in commentsList" :comments="comments" :bid="blog?.id" />
+                <!-- <commentsCard v-for="comments in commentsList" :comments="comments" :bid="blog?.id" /> -->
             </el-main>
             <el-footer>
             </el-footer>
@@ -232,34 +232,33 @@
         </button>
     </el-drawer>
     <!-- 修改弹出框 -->
-    <el-drawer v-model="editChangeOpen" title="I am the title" :with-header="false" direction="btt" size="80%">
+    <!-- <el-drawer v-model="editChangeOpen" title="I am the title" :with-header="false" direction="btt" size="80%">
         <MarkdownRenderer type="change" :blog="blog" />
-    </el-drawer>
+    </el-drawer> -->
 </template>
 
 <script lang="ts" setup>
 import { ElMessage } from 'element-plus'
-
-import API from '@/plugins/axiosInstance';
+ import { getPostByIdService, queryPostsService } from '@/api/post'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
-import type { Blog, Comments } from '@/lib/types'
+import type { Post, Comment } from '@/lib/types'
 import useClipboard from "vue-clipboard3";
-import { userStore } from '@/store';
+import { useUserInfoStore } from '@/stores/userInfo'
 import commentsCard from './commentsCard.vue'
-import MarkdownRenderer from '@/components/front/MarkdownRenderer.vue'
+// import MarkdownRenderer from '@/components/front/MarkdownRenderer.vue'
 
 const { toClipboard } = useClipboard();
 const { params } = useRoute()
 const router = useRouter()
 const bid = params.bid
-const blog = ref<null | Blog>(null)
+const blog = ref<null | Post>(null)
 const markdown = ref("")
 const userImg = ref("")
 const type = ref("#all")
-const loadBlogDone = ref(false)
-const openEditer = ref(false)
-const editChangeOpen = ref(false)
+const loadBlogDone = ref(false) // 是否加载完成
+const openEditer = ref(false) //是否弹出评论编辑器
+const editChangeOpen = ref(false) // 编辑器 弹出框
 const commentsList = ref<any>([])
 const shareColor = ref(['#9b9b9b', '#ffffff'])
 
@@ -287,7 +286,7 @@ const deleteColor = ref(['#9b9b9b', '#ffffff'])
 // 编辑状态
 const editColor = ref(['#9b9b9b', '#ffffff'])
 
-let comments = reactive<Comments>({
+let comments = reactive<Comment>({
     id: "",
     bid: "000",
     blogUid: "000",
@@ -310,9 +309,9 @@ const subscribeChoice = () => {
 }
 
 const unSubscribe = () => {
-    if (userStore().$state.isLogin) {
+    if (useUserInfoStore().$state.isLogin) {
         API({
-            url: '/unSubscribe/' + blog.value?.user.id + "/" + userStore().$state.user.id,
+            url: '/unSubscribe/' + blog.value?.user.id + "/" + useUserInfoStore().$state.user.id,
             method: 'get'
         }).then((res) => {
             ElMessage({
@@ -327,9 +326,9 @@ const unSubscribe = () => {
 
 }
 const subscribe = () => {
-    if (userStore().$state.isLogin) {
+    if (useUserInfoStore().$state.isLogin) {
         API({
-            url: '/subscribe/' + blog.value?.user.id + "/" + userStore().$state.user.id,
+            url: '/subscribe/' + blog.value?.user.id + "/" + useUserInfoStore().$state.user.id,
             method: 'get'
         }).then((res) => {
             ElMessage({
@@ -344,8 +343,8 @@ const subscribe = () => {
 
 }
 // 未登录 和 登录后得到帖子的详细内容
-let getBlogDetialUrl = userStore().$state.isLogin ?
-    '/queryBlog/' + userStore().$state.user.id + "/" + bid :
+let getBlogDetialUrl = useUserInfoStore().$state.isLogin ?
+    '/queryBlog/' + useUserInfoStore().$state.user.id + "/" + bid :
     '/queryBlog/0/' + bid
 
 API({
@@ -440,7 +439,7 @@ const removeBlog = () => {
 }
 // 打开回复评论窗口
 const openCommentsEdit = () => {
-    if (userStore().$state.isLogin == false) {
+    if (useUserInfoStore().$state.isLogin == false) {
         ElMessage.error("未登录")
         return 0;
     } else {
@@ -449,8 +448,8 @@ const openCommentsEdit = () => {
 }
 // 得到评论列表
 const getCommentsList = () => {
-    let getCommentsUrl = userStore().$state.isLogin ?
-        '/getCommentsList/' + blog.value?.id + "/" + userStore().$state.user.id :
+    let getCommentsUrl = useUserInfoStore().$state.isLogin ?
+        '/getCommentsList/' + blog.value?.id + "/" + useUserInfoStore().$state.user.id :
         '/getCommentsList/' + blog.value?.id + "/0"
     API({
         url: getCommentsUrl,
@@ -467,7 +466,7 @@ const getCommentsList = () => {
 const addLike = () => {
     let state = blog.value?.likeState == 1 ? 0 : 1
     API({
-        url: '/likeBlog/' + userStore().$state.user.id + '/' + blog.value?.id + "/" + state,
+        url: '/likeBlog/' + useUserInfoStore().$state.user.id + '/' + blog.value?.id + "/" + state,
         method: 'get'
     }).then((res) => {
         ElMessage({
@@ -495,7 +494,7 @@ const addLike = () => {
 const addStar = () => {
     let state = blog.value?.starState == 1 ? 0 : 1
     API({
-        url: '/starBlog/' + userStore().$state.user.id + '/' + blog.value?.id + "/" + state,
+        url: '/starBlog/' + useUserInfoStore().$state.user.id + '/' + blog.value?.id + "/" + state,
         method: 'get'
     }).then((res) => {
         ElMessage({
@@ -523,7 +522,7 @@ const addStar = () => {
 const sendComments = () => {
     comments.bid = blog.value!.id
     comments.blogUid = blog.value!.user.id
-    comments.commentsUid = userStore().$state.user.id
+    comments.commentsUid = useUserInfoStore().$state.user.id
     comments.commentsContext = markdown.value
     API({
         url: '/addComments',

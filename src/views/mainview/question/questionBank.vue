@@ -62,7 +62,8 @@ const changePage = (new_page: number) => {
 const getQuestionListData = async () => {
   loading.value = true;
   const offset = (page.value - 1) * page_size;
-  let result = await getQuestionList(offset,page_size);
+  let result;
+  result = await getQuestionList(offset,page_size);
   loading.value = false;
   total_size.value = result.data.totalItems;
   
@@ -89,9 +90,28 @@ const searchQuestionData = async () => {
     return;
   }
 
-  let result = await searchQuestion(page.value, searchContent.value);
-  total_size.value = result.data.length;
-  tableData.question_list = result.data;
+  // let result = await searchQuestion(page.value, searchContent.value);
+  console.log(searchContent.value)
+  let result = await getQuestionById(searchContent.value)
+  console.log(result.data)
+  if (result.data === null) {
+    ElNotification({
+      title: "error",
+      message: "没有找到该题目",
+      type: 'error',
+      
+    });
+    getQuestionListData();
+    return;
+  }
+  // total_size.value = result.data.length;
+  total_size.value = 1;
+// 修改 tag 字段
+  result.data.tag = result.data.tag 
+      ? result.data.tag.split(',').map(tag => tag.trim()) 
+      : [];
+  console.log(result.data.tag)
+  tableData.question_list = [result.data];
 };
 </script>
 <template>

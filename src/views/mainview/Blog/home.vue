@@ -21,7 +21,7 @@
           </el-input>
           <el-divider />
           <div v-loading="blogListLoading">
-            <blogCard v-for="post in blogList" :blog="post" />
+            <blogCard v-for="post in blogList" :post="post" />
           </div>
 
         </el-card>
@@ -58,7 +58,7 @@ const blogList = ref<any>([])
   
 const getBlogList = async () => {
   const res = await queryPostsService(10, 0, undefined , undefined);
-  // console.log(res.data);
+  console.log(res.data);
   blogList.value = res.data
   console.log(blogList.value);
   blogListLoading.value = false

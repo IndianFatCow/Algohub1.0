@@ -30,8 +30,13 @@ import userCenter from '@/views/mainview/userCenter/mainpage.vue'
 import userAvatarvue from '@/views/admin/userCenter/UserAvatar.vue'
 import userInfovue from '@/views/admin/userCenter/UserInfo.vue'
 import userResetpasswordvue from '@/views/admin/userCenter/UserResetPassword.vue'//修改密码
+//社区页面
+import home from '@/views/mainview/Blog/home.vue'//社区首页
+import blogDetail from '@/views/mainview/Blog/components/BlogDetial.vue'//社区详情
+
 
 import setupAllRouterGuard from './listen'//监听路由
+import component from 'element-plus/es/components/tree-select/src/tree-select-option.mjs'
 //定义路由关系
 const routes = [
     { path: '/login', component: LoginVue },    
@@ -65,7 +70,9 @@ const routes = [
             {path: '/userCenter/info', component: userInfovue},
             {path: '/userCenter/repassword', component: userResetpasswordvue}
         ]
-    }
+    },
+    { path: '/blog', component: home },
+    { path: '/blog/:id', component: blogDetail },
     // { path: '/:catchAll(.*)', component: NotFound ,meta:{ hidden: true }},//404页面
 ]
 

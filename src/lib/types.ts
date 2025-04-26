@@ -47,20 +47,20 @@ export interface userInfo {
     ban?: number // 可选字段
 }
 
-export interface BlogUser{//博客用户
-    id:string,
-    nickName:string,
-    email:string,
-    level:number,
-    location:string,
-    school:string,
-    tag:string,
-    gender:string,
-    url:string,
-    sign:string,
-    fans:string,
-    subscribe:string
-}
+// export interface BlogUser{//博客用户
+//     id:string,
+//     nickName:string,
+//     email:string,
+//     level:number,
+//     location:string,
+//     school:string,
+//     tag:string,
+//     gender:string,
+//     url:string,
+//     sign:string,
+//     fans:string,
+//     subscribe:string
+// }
 
 export interface Post {
     ID: number; // 帖子的唯一标识符

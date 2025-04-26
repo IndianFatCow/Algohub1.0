@@ -85,13 +85,13 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
-import type { Comments } from '@/lib/types'
+import type { Comment } from '@/lib/types'
 import { ElNotification } from 'element-plus'
 import { userStore } from '@/store';
 import API from '@/plugins/axiosInstance';
 import { ElMessage } from 'element-plus'
 const props = defineProps(['comments','bid'])
-const comments: Comments = props.comments
+const comments: Comment = props.comments
 const deleteColor = ref(['#9b9b9b', '#ffffff'])
 
 // 喜欢状态
@@ -110,7 +110,7 @@ const shareColor = ref(['#9b9b9b', '#ffffff'])
 const commentsColor = ref(['#6b7280', '#ffffff'])
 const openEditer = ref(false)
 // 评论中的评论
-let commentsC = reactive<Comments>({
+let commentsC = reactive<Comment>({
     id: "",
     bid: "000",
     blogUid: "000",

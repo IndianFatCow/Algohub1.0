@@ -105,12 +105,10 @@
   import type { userInfo, Post, Like, Comment } from '@/lib/types'
   
   
-  // props & data
-  interface Props { post: Post }
-  const props = defineProps<Props>()
+  interface Props { post: Post }  // 确保传入的博客数据包含了（post）所有的字段
+  const props = defineProps<Props>() //接受父组件传参
   const post = props.post
   
-  // user info from store
   const userInfoStore = useUserInfoStore()
   const postUseravatar = computed(() => userInfoStore.userinfo.avatar)
 //   const postUser = computed(() => ({

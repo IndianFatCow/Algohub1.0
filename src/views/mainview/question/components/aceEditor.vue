@@ -342,6 +342,7 @@ export default {
         //准备调试
         async beforeDebug (){
             this.isDebug=true;
+            this.isError = false // 隐藏错误提示
             const res = await getSolution(this.qid )
             console.log(res);
             this.input = res.data.items[0].data_test == null ? "示例输入 " : res.data.items[0].data_test
@@ -350,6 +351,7 @@ export default {
         },
         // 调试代码
         async debug () {
+            console.log('调试代码');
             let varnow = Date.now() // 当前时间
             let varlast = judgerStore().$state.lasttime // 上次提交时间
             if ((varnow - varlast) < 3000) {  // 8秒内禁止提交
@@ -414,6 +416,7 @@ export default {
         },
         // 提交请求
         async judge () {
+            console.log('提交代码');
             let varnow = Date.now() // 当前时间
             let varlast = judgerStore().$state.lasttime // 上次提交时间
             if ((varnow - varlast) < 3000) {  // 8秒内禁止提交

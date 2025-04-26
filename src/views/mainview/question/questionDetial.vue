@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import submitRecord from './components/submitRecord.vue'
 import aceEditor from './components/aceEditor.vue'
+import sloving from './components/sloving.vue'
 import questionCard from './components/questionCard.vue'
 import { StarFilled } from '@element-plus/icons-vue'
 import { ref, reactive } from 'vue'
@@ -62,7 +63,10 @@ const qid= questionStore().$state.currentChoice.unique_id
             <el-tab-pane v-if="isLogin" label="提交记录" name="second">
               <submitRecord :uid="'detail'" />
             </el-tab-pane>
-
+            <!-- 题解 -->
+            <el-tab-pane label="题解" name="third">
+              <sloving :qid="qid" />
+            </el-tab-pane>
           </el-tabs>
 
         </el-card>
