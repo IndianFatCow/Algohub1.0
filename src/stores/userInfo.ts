@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import type { userInfo } from "@/lib/types"; // 确保路径正确
 
 // interface userinfo {
@@ -92,8 +92,10 @@ export const useUserInfoStore = defineStore("userinfo", {
             };
             this.isLogin = false;
             this.isAdmin = false;
-        }
+        },
+
     },
+
 
     persist: true // 启用持久化存储
 });

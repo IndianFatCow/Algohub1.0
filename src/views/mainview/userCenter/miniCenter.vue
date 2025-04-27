@@ -53,7 +53,7 @@ const authStore = useAuthStore();
 //     userInfoStore.updateAvatarFromBlob(img)//设置用户头像
 // }
 // init_avatar()
-console.log(userInfoStore.userinfo.avatar)
+// console.log(userInfoStore.userinfo.avatar)
 userInfoStore.chageAvatarUrl()//设置用户头像
 const handleCommand = (command) => {
     switch (command) {

@@ -48,7 +48,15 @@ const tableData = reactive({
 const toProblemDetail = (question: Question) => {
   judgerStore().setJudgeType(100);
   questionStore().setCurrentChoice(question);
-  router.push({ path: '/questionDetial' });
+    // 使用命名路由并传递参数
+  // router.push({
+  // name: 'questionDetail', // 使用路由名称代替硬编码的路径
+  // params: {
+  //   id: question.unique_id // 将 unique_id 作为参数传递
+  // }
+  // });
+  const path = `/questionDetail/${question.unique_id}`;
+  router.push(path);
 };
 
 // 改变页码

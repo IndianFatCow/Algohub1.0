@@ -23,7 +23,7 @@ import visualAlgo from '@/views/admin/contentAdmin/show.vue'
 //通用页面
 //题库页面
 import questionBank from '@/views/mainview/question/questionBank.vue'//题库
-import questionDetial from '@/views/mainview/question/questionDetial.vue'//题目详情
+import questionDetail from '@/views/mainview/question/questionDetail.vue'//题目详情
 // import NotFound from '@/views/NotFound.vue'//404页面
 //用户中心页面
 import userCenter from '@/views/mainview/userCenter/mainpage.vue'
@@ -57,8 +57,11 @@ const routes = [
         [       
                 {path: '/show', component: showVue},
                 {path: '/home', component: homepage},
-                {path: '/question-bank', component: questionBank},
-                {path: '/questionDetial', component: questionDetial},
+                {path: '/question-bank', component: questionBank ,
+                    // 将查询参数 q 作为 props.searchQuery 传入
+                props: route => ({ searchQuery: route.query.q || '' })
+                },
+                {path: '/questionDetail/:id', component: questionDetail},
                 {path: '/profile', component: profile},
                 {path: '/qa', component: qa},
                 {path: '/visual-algo', component: visualAlgo}      

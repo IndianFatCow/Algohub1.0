@@ -41,10 +41,11 @@ const updateAvatar = async () => {
     const result = await userAvatarUpdateService(userInfoStore.userinfo.username, selectedFile.value);
     
     // 生成预览 URL
-    URL.revokeObjectURL(userInfoStore.userinfo.avatar); // 清除之前的 URL
-    const blobUrl = URL.createObjectURL(selectedFile.value);
-    userInfoStore.updateAvatarFromBlob(blobUrl);
-    imgUrl.value = blobUrl;
+    // URL.revokeObjectURL(userInfoStore.userinfo.avatar); // 清除之前的 URL
+    // const blobUrl = URL.createObjectURL(selectedFile.value);
+    userInfoStore.userinfo.avatar = result.data.sub_url; // 更新头像图片的 URL
+    userInfoStore.chageAvatarUrl();
+    imgUrl.value = userInfoStore.userinfo.avatar; // 更新头像图片的 URL
 
     ElMessage.success(result.data?.message || '上传成功');
   // } catch (err) {

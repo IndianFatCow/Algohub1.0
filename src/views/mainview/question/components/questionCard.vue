@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { questionStore } from '@/stores/questionStore';
 import { useRouter } from 'vue-router';
-import { reactive } from 'vue';
+import { reactive,ref } from 'vue';
+import { getSolution } from '@/api/submit';
 const route = useRouter()
-// const from = route.query.from //判断用户是从 "题目列表" 还是 "提交记录" 进入
-const from = (true)?"questionBank":"submitRecord" //测试用
+// const from = (true)?"questionBank":"submitRecord" //测试用
 // console.log(from);
 // 当前题目选择存储
 const quesitonStore = questionStore()
@@ -27,30 +27,17 @@ const questions = reactive({
           totalAttempt: 0,
       },
 })
+const solution = ref([])
 
-if (from == "record") {
-  // 从后台加载
-  // const res = await getQuestionById(route.query.from.unique_id)
-  //   questions.question = res.data.data
-  //   questions.question.inputSample = JSON.parse(questions.question.inputSample)
-  //   questions.question.outputSample = JSON.parse(questions.question.outputSample)
-  //   questions.question.tag = JSON.parse(questions.question.tag)
-  //   loading_question.value = false
-} else {
-  // 从pina加载题目
+
+const showSlotion = async () => {
+    // 从pina加载题目
   questions.question = quesitonStore.$state.currentChoice
-  // if (typeof questions.question.inputSample == "string") {//检查是否是字符串
-  //   questions.question.inputSample = JSON.parse(questions.question.inputSample)
-  //   questions.question.outputSample = JSON.parse(questions.question.outputSample)
-  //   questions.question.tag = JSON.parse(questions.question.tag)
-  // } else {
-  //   questions.question.inputSample = questions.question.inputSample
-  //   questions.question.outputSample = questions.question.outputSample
-  //   questions.question.tag = questions.question.tag
-  // }
-
+  let res = await getSolution(questions.unique_id)
+  solution.value = res.data.items
 
 }
+showSlotion()
 </script>
 
 <template>
@@ -70,12 +57,30 @@ if (from == "record") {
     <el-container class="divider-group">
         <el-main>
             <p class="description">{{ questions.question.descrition }}</p>
+                <!-- 如果没有用例，显示空状态 -->
+                  <el-empty v-if="!solution.length" description="暂无测试用例" />
+
+                  <div class="examples-container">
+                    <div
+                      v-for="(item, idx) in solution"
+                      :key="item.ID || idx"
+                      class="example-card"
+                    >
+                        <span class="example-label">示例 {{ idx + 1 }}：</span>
+                        <br>
+                        <span class="description-label">输入:</span>
+                          <code class="code-block">{{ item.data_test }}</code>
+                          <br>
+                        <span class="description-label">输出:</span>
+                          <code class="code-block"> {{ item.result_test }}</code>
+                    </div>
+                  </div>
         </el-main>
         <el-aside>
             <div class="divider-group">
                 <div class="info-item">
                     <span>时空限制：</span>
-                    <span>{{ questions.question.time_limit }}ms / {{ (questions.question.memory_limit / 1024) }}kb</span>
+                    <span>{{ questions.question.time_limit }}ms / {{ (questions.question.memory_limit / 1024).toFixed(2) }}Mb</span>
                 </div>
 
                 <el-divider>
@@ -149,5 +154,32 @@ if (from == "record") {
 /* 如果需要，可以为所有 info-item 设置统一的最大字体大小 */
 .info-item span {
   font-size: 14px; /* 统一设置字体大小 */
+}
+.examples-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 靠左对齐 */
+}
+
+.example-card {
+  width: fit-content; /* 自由布局 */
+  margin-bottom: 16px; /* 卡片之间的间距 */
+}
+
+/* “示例”标签样式：保持正常大小并加粗 */
+.example-label {
+  font-size: 0.8em; /* 字体大小设置为正常大小 */
+  font-weight: bold; /* 加粗显示 */
+}
+
+/* 描述（如“输入”，“输出”）标签样式 */
+.description-label {
+  font-size: 0.5em; /* 字体稍小一些 */
+}
+
+/* 代码块样式：确保代码易于阅读 */
+.code-block {
+  font-size: 0.5em; /* 缩小字体大小 */
+  background-color: #f5f7fa; /* 浅灰色背景 */
 }
 </style>

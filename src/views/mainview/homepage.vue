@@ -1,6 +1,6 @@
 <script setup>
-import { createApp, ref } from 'vue';
-import { ElButton, ElInput, ElAvatar, ElDropdown, ElDropdownItem, ElDropdownMenu, ElContainer, ElHeader, ElMain, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElCard } from 'element-plus';
+import { ref } from 'vue';
+import {ElMessage, ElButton, ElInput, ElAvatar, ElDropdown, ElDropdownItem, ElDropdownMenu, ElContainer, ElHeader, ElMain, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElCard } from 'element-plus';
 import {
     Management,
     Promotion,
@@ -14,20 +14,25 @@ import {
     Menu,
     Search,
 } from '@element-plus/icons-vue'
-import { useAuthStore } from '@/store/store';
-import { useTokenStore } from '@/store/token';
-import { userLogoutService } from '@/api/user';
-import { useUserInfoStore } from '@/stores/userInfo';
-//头像条目点击后的处理
+// import { useAuthStore } from '@/store/store';
+// import { useTokenStore } from '@/store/token';
+// // import { userLogoutService } from '@/api/user';
+// import { useUserInfoStore } from '@/stores/userInfo';
+// //头像条目点击后的处理
 import { useRouter } from 'vue-router'
 const router = useRouter();
-const authStore = useAuthStore();
-const tokenStore = useTokenStore()
-const userInfoStore = useUserInfoStore();
+// const authStore = useAuthStore();
+// const tokenStore = useTokenStore()
+// const userInfoStore = useUserInfoStore();
 
 const searchText = ref('');
+const searchType = ref('problems'); // 默认搜索类型为用户
 const handleSearch = () => {
   if (searchText.value.trim() === '') {
+    ElMessage({
+      message: '请输入搜索内容',
+      type: 'warning',
+    });
     return;
   }
   // 跳转到搜索结果页面
