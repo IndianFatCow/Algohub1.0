@@ -72,7 +72,7 @@ const routes = [
         ]
     },
     { path: '/blog', component: home },
-    { path: '/blog/:id', component: blogDetail },
+    { path: '/blogDetail/:id', component: blogDetail },
     // { path: '/:catchAll(.*)', component: NotFound ,meta:{ hidden: true }},//404页面
 ]
 

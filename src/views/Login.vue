@@ -78,7 +78,7 @@ const rules = {
     ]
 }
 //调用后台接口,完成注册
-import { userRegisterService, userLoginService ,userAvatarService} from '@/api/user'
+import { userRegisterService, userLoginService } from '@/api/user'
 // import { el } from 'element-plus/es/locales.mjs'
 //验证注册是否成功
 const register = async () =>{
@@ -110,12 +110,10 @@ const login = async () =>{
     }
 
     AuthStore.$state.user = registerData.value;
-    const Auth = AuthStore.getAuthHeader()
- 
     
-    let restoken = await userLoginService(Auth);
+    let restoken = await userLoginService(AuthStore.getAuthHeader());
     // console.log(AuthStore.$state)
-    // console.log('restoken'+restoken.data.data)
+    // console.log(restoken.data.data)
     //由于登录请求用到是新构造的request，返回对象中data.data是token
     token.setToken(restoken.data.data)//根据后台设置token
 

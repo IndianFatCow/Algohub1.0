@@ -17,15 +17,15 @@ import avatar from '@/assets/default.png'
 import {userInfoService} from '@/api/user.js'
 import {useUserInfoStore} from '@/stores/userInfo'
 
-const userInfo = useUserInfoStore().userinfo
+const userInfo = useUserInfoStore()
 const getUserInfo = async ()=>{
     let result = await userInfoService(userInfo.username);
     // console.log("前台",result);
-    userInfo.value = result.data;
+    userInfo.userinfo.value = result.data;
     // console.log(authStore.userInfo.username);
 }
 getUserInfo();
-
+userInfo.chageAvatarUrl()//设置用户头像
 //头像条目点击后的处理
 import { useRouter } from 'vue-router'
 const router = useRouter();

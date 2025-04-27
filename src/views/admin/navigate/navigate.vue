@@ -20,20 +20,19 @@ const showInfo = () => {
 };
 
 import { useUserInfoStore } from "@/stores/userInfo";
-import { userAvatarService } from "@/api/user";
 const UserInfoStore = useUserInfoStore();
 // 获取用户头像
-const getAvatar = async () => {
-  let blob = await userAvatarService(UserInfoStore.userinfo.username)//获取用户头像
-  console.log('blob is '+blob)
-  let img = URL.createObjectURL(blob)//将blob转换为url
-  UserInfoStore.updateAvatarFromBlob(img)//设置用户头像
-};
-// 清除 URL
-const clearURL = () => {
-  URL.revokeObjectURL(UserInfoStore.userinfo.avatar);
-  UserInfoStore.updateAvatarFromBlob(null);
-};
+// const getAvatar = async () => {
+//   let blob = await userAvatarService(UserInfoStore.userinfo.username)//获取用户头像
+//   console.log('blob is '+blob)
+//   let img = URL.createObjectURL(blob)//将blob转换为url
+//   UserInfoStore.updateAvatarFromBlob(img)//设置用户头像
+// };
+// // 清除 URL
+// const clearURL = () => {
+//   URL.revokeObjectURL(UserInfoStore.userinfo.avatar);
+//   UserInfoStore.updateAvatarFromBlob(null);
+// };
 </script>
 
 <template>
@@ -52,8 +51,6 @@ const clearURL = () => {
 
       <!-- 点击按钮显示 Info 页面 -->
       <button @click="showInfo">查看用户信息</button>
-      <button @click="getAvatar">获取用户头像</button>
-      <button @click="clearURL">清除头像存储</button>
     </div>
   </div>
 

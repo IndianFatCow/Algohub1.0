@@ -11,7 +11,8 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "ace-builds": "^1.39.0",
+    "@icon-park/vue-next": "^1.4.2",
+    "ace-builds": "^1.40.1",
     "axios": "^1.8.3",
     "element-plus": "^2.9.6",
     "mitt": "^3.0.1",

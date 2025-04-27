@@ -36,7 +36,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/store/store';
 import { useTokenStore } from '@/store/token';
-import { userLogoutService,userAvatarService } from '@/api/user';
+import { userLogoutService } from '@/api/user';
 import { useUserInfoStore } from '@/stores/userInfo';
 //头像条目点击后的处理
 import { useRouter } from 'vue-router'
@@ -45,14 +45,16 @@ const tokenStore = useTokenStore()
 const userInfoStore = useUserInfoStore();
 const authStore = useAuthStore();
 // console.log(userInfoStore.userinfo.avatar)
-const init_avatar = async  () => {
-    let blob =await userAvatarService(userInfoStore.userinfo.username)//获取用户头像
-    // console.log(blob)
+// const init_avatar = async  () => {
+//     let blob =await userAvatarService(userInfoStore.userinfo.username)//获取用户头像
+//     // console.log(blob)
 
-    let img = URL.createObjectURL(blob)//将blob转换为url
-    userInfoStore.updateAvatarFromBlob(img)//设置用户头像
-}
-init_avatar()
+//     let img = URL.createObjectURL(blob)//将blob转换为url
+//     userInfoStore.updateAvatarFromBlob(img)//设置用户头像
+// }
+// init_avatar()
+console.log(userInfoStore.userinfo.avatar)
+userInfoStore.chageAvatarUrl()//设置用户头像
 const handleCommand = (command) => {
     switch (command) {
         case 'info':

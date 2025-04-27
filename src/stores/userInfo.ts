@@ -44,7 +44,7 @@ export const useUserInfoStore = defineStore("userinfo", {
             bio: "",
             company: "",
             location: "",
-            profile_url: ""
+            profile_url: "",
         },
         isLogin: false,
         isAdmin: false
@@ -57,9 +57,20 @@ export const useUserInfoStore = defineStore("userinfo", {
             this.isLogin = stateUpdate.isLogin;
             this.isAdmin = (stateUpdate.isAdmin);
         },
-        updateAvatarFromBlob(objectUrl: string) {
-            this.userinfo.avatar = objectUrl;
-          },
+        chageAvatarUrl( ) {
+            // 获取新的和旧的URL头
+            const oldPrefix = 'http://minio:9000';
+            const newPrefix = 'http://127.0.0.1:9000';
+
+            // 检查当前URL是否以旧的前缀开头
+            if (this.userinfo.avatar.startsWith(oldPrefix)) {
+                // 替换为新的前缀
+                this.userinfo.avatar = newPrefix + this.userinfo.avatar.substring(oldPrefix.length);
+            }
+        },
+        // updateAvatarFromBlob(objectUrl: string) {
+        //     this.userinfo.avatar = objectUrl;
+        //   },
         removeUserInfo() {
             this.userinfo = {
                 ID: 0,

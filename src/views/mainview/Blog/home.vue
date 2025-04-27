@@ -21,7 +21,8 @@
           </el-input>
           <el-divider />
           <div v-loading="blogListLoading">
-            <blogCard v-for="post in blogList" :post="post" />
+            <blogCard v-for="item in blogList.items" :post="item" :key="item.instanceID" />
+            <!-- <blogCard v-if="blogList.items && blogList.items.length > 0" :post="blogList.items[0]"/> -->
           </div>
 
         </el-card>
@@ -32,6 +33,7 @@
     <el-aside width="20%"></el-aside>
   </el-container>
 </template>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
@@ -43,6 +45,7 @@ import blogCard from './components/blogCard.vue'
 import { useRoute } from 'vue-router';
 import { Search } from '@element-plus/icons-vue'
 
+import show from '../compoment/show.vue'
 // import { usePostStore } from '@/stores/postStore'
 // const postStore = usePostStore()
 
@@ -58,9 +61,10 @@ const blogList = ref<any>([])
   
 const getBlogList = async () => {
   const res = await queryPostsService(10, 0, undefined , undefined);
-  console.log(res.data);
+  // console.log(res.data);
   blogList.value = res.data
-  console.log(blogList.value);
+  // console.log(blogList.value);
+  // console.log(blogList.value.items[0]);
   blogListLoading.value = false
 }
 getBlogList()
@@ -71,6 +75,7 @@ const searchBlog = async () => {//搜索博客
     blogList.value = res.data.data
     blogListLoading.value = false
     console.log(blogList.value);
+
 }
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {

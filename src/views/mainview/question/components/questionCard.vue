@@ -75,7 +75,7 @@ if (from == "record") {
             <div class="divider-group">
                 <div class="info-item">
                     <span>时空限制：</span>
-                    <span>{{ questions.question.time_limit }}s / {{ (questions.question.memory_limit / 1024) }}Mb</span>
+                    <span>{{ questions.question.time_limit }}ms / {{ (questions.question.memory_limit / 1024) }}kb</span>
                 </div>
 
                 <el-divider>

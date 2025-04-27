@@ -73,7 +73,7 @@ export interface Post {
     author: string; // 帖子作者
 }
 
-export interface Comment {
+export interface comment {
     ID: number; // 评论的唯一标识符
     instanceID: number; // 实例ID
     createdAt: string; // 创建时间
@@ -90,7 +90,7 @@ export interface Comment {
 //     totalItems: number; // 总文章数
 //     Items: Post[]; // 具体的文章项数组
 // }
-export interface Like {//点赞
+export interface like {//点赞
     ID: number; // 文章点赞的唯一标识符
     instanceID: number; // 实例ID
     createdAt: string; // 创建时间

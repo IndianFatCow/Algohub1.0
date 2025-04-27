@@ -213,6 +213,7 @@ export default {
         let isError = ref(false)
         let submitError = ref(false) // 提交错误
         // let errorMsg = ref('')
+        // let compileError = ref(false) // 编译错误
         let isDebug = ref(false) // 是否调试
         let input = ref("")
         let output = ref("")
@@ -345,7 +346,7 @@ export default {
             this.isError = false // 隐藏错误提示
             const res = await getSolution(this.qid )
             console.log(res);
-            this.input = res.data.items[0].data_test == null ? "示例输入 " : res.data.items[0].data_test
+            this.input = res.data.items[0].data_test == null ? " " : res.data.items[0].data_test
             this.output = res.data.items[0].result_test == null ? "" : res.data.items[0].result_test
 
         },
@@ -451,7 +452,6 @@ export default {
             // 发送判题请求
             console.log(judgeData);
             const res =await submitCode(judgeData.qid,judgeData.code,judgeData.language)
-            console.log(res);
             const isPass = res.data.status == 'ACCEPTED' ? true : false
             this.submiting = false // 提交完成
             if (res == undefined) {
@@ -465,16 +465,23 @@ export default {
             })
 
             this.underMessage = ref(res.data.message? res.data.message : res.data.status)
-            if (!isPass) {
+            if (!isPass && res.data.status != 'COMPILATION_ERROR') {
                 // 失败
                 this.isCorrect = false
                 this.isError = true
                 this.submitError = true
                 this.errorMsg = res.data.details
-                // this.input = res.data.input == null ? "示例输入 " : res.data.data.testSample.input
-                this.output = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
-                this.answer = res.data.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output
-            } else {
+                this.input = res.data.case_info.input == null ? "" : res.data.data.case_info.input
+                this.answer = res.data.case_info.expected_output == null ? "" : res.data.case_info.expected_output
+                this.output = res.data.data.case_info.actual_output == null ? " " : res.data.case_info.actual_output //实际输出
+            } else if(res.data.status == 'COMPILATION_ERROR'){
+                // console.log('编译错误');
+                // this.compileError = true
+                this.isError = true
+                this.isCorrect = false
+                this.submitError = false
+            }
+            else {
                 // 成功
                 // this.infoIndex = 5
                 // this.stepInfoMsg[4] = this.stepDoneMsg[4]

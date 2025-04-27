@@ -3,6 +3,21 @@ import request from '@/utils/request'
 
 //订阅用户
 export const subscribeUser = (username: string) => {
-    return request(`/subscribe/user/${username}`)
+    return request.post(`/subscribe/user/${username}`)
 }
 //取消订阅
+export const unsubscribeUser = (username: string) => {
+    return request.delete(`/subscribe/user/${username}`)
+}
+//获取订阅列表
+export const getSubscribeList = (username: string, resource_type: string,offset?:number,limit?:number) => {
+    return request.get(`/user/${username}/${resource_type}/subscribe`,{params:{offset,limit}})
+}
+//获取订阅数目
+export const getSubscribeCount = (username: string) => {
+    return request.get(`subscribe/${username}/count`)
+}
+//查看是否订阅
+export const checkSubscribe = (username: string) => {
+    return request.get(`/subscribe/user/${username}/check`)
+}

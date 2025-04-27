@@ -242,7 +242,7 @@ import { ElMessage } from 'element-plus'
  import { getPostByIdService, queryPostsService } from '@/api/post'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
-import type { Post, Comment } from '@/lib/types'
+import type { Post, comment } from '@/lib/types'
 import useClipboard from "vue-clipboard3";
 import { useUserInfoStore } from '@/stores/userInfo'
 import commentsCard from './commentsCard.vue'
@@ -271,14 +271,14 @@ const subscribedClass = ref("px-4 py-1 bg-black text-gray-600 inline-flex items-
 const unSubscribeClass = ref("px-4 py-1 bg-black text-gray-200 inline-flex items-center justify-center mb-2 hover:bg-gray-500")
 
 // 喜欢状态
-const likeMouseEnter = ref(['#67C23A', '#ffffff'])
-const likeMouseLeave = ref(['#9b9b9b', '#ffffff'])
-const likeColor = ref(['#9b9b9b', '#ffffff'])
+const likeMouseEnter = ref(['#67C23A', '#ffffff']) // 鼠标移入
+const likeMouseLeave = ref(['#9b9b9b', '#ffffff']) // 鼠标移出
+const likeColor = ref(['#9b9b9b', '#ffffff']) // 鼠标移出时的颜色
 
-// 收藏状态
-const starMouseEnter = ref(['#f5a623', '#ffffff'])
-const starMouseLeave = ref(['#9b9b9b', '#ffffff'])
-const starColor = ref(['#9b9b9b', '#ffffff'])
+// // 收藏状态
+// const starMouseEnter = ref(['#f5a623', '#ffffff'])
+// const starMouseLeave = ref(['#9b9b9b', '#ffffff'])
+// const starColor = ref(['#9b9b9b', '#ffffff'])
 
 // 删除状态
 const deleteColor = ref(['#9b9b9b', '#ffffff'])
@@ -286,21 +286,20 @@ const deleteColor = ref(['#9b9b9b', '#ffffff'])
 // 编辑状态
 const editColor = ref(['#9b9b9b', '#ffffff'])
 
-let comments = reactive<Comment>({
-    id: "",
-    bid: "000",
-    blogUid: "000",
-    commentsUid: "000",
-    time: "",
-    context: "",
-    commentsContext: "",
-    like: 0,
-    star: 0,
-    commentsUser: null,
-    user: null,
-    likeState: 0
+let comments = reactive<comment>({
+    ID: 0,
+    // bid: "000",
+    refer_type: "", //引用的类型
+    instanceID: 0, // 评论的实例ID
+    createdAt: "",
+    content: "",
+    author: "",
+    refer_id: 0,//引用的评论，可选
+    source_id: 0,//源ID，例如帖子ID
+    source_type: "",//源类型，例如 "post"
+    updatedAt: "",
 })
-const subscribeChoice = () => {
+const subscribeChoice = () => {//关注
     if(subscribeState.value){
         unSubscribe()
     }else{
@@ -308,7 +307,7 @@ const subscribeChoice = () => {
     }
 }
 
-const unSubscribe = () => {
+const unSubscribe = () => {// 取消关注
     if (useUserInfoStore().$state.isLogin) {
         API({
             url: '/unSubscribe/' + blog.value?.user.id + "/" + useUserInfoStore().$state.user.id,

@@ -2,7 +2,7 @@
 import request from '@/utils/request.js'
 //提供调用注册接口的函数
 import axios from 'axios';
-import { useNamespace } from 'element-plus';
+// import { useNamespace } from 'element-plus';
 
 // 创建一个避免拦截器的Axios实例用于登录
 const loginRequest = axios.create({
@@ -72,22 +72,23 @@ export const userAvatarUpdateService = (username:string, avatarFile: File) => {
 }
 
 //获取用户头像
-export const userAvatarService = (username:string)=>{
-    return request.get(`/user/${username}/avatar`,{
-        responseType: 'blob' // 设置响应类型为blob
-    })
-    // return request.get(`/user/${username}/avatar`)
-}
+// export const userAvatarService = (username:string)=>{
+//     return request.get(`/user/${username}/avatar`,{
+//         responseType: 'blob' // 设置响应类型为blob
+//     })
+//     // return request.get(`/user/${username}/avatar`)
+// }
 //修改密码
 export const userResetPasswordService = (username:string,passwordData:any)=>{
     return request.put(`/user/${username}`,passwordData)
 }
-export const SearchUserService = (username:string,offset:any,limit:any)=>{
+//搜索用户
+export const SearchUserService = (username:string, offset?:number,limit?:number)=>{
     return request.get('/user',{
         params:{
             username,
-            offset,
-            limit
+            offset: offset !== undefined ? offset : 0, // 如果offset未提供，则使用0
+            limit: limit !== undefined ? limit : 10   // 如果limit未提供，则使用10
         }
     })
 }
