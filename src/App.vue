@@ -14,6 +14,7 @@
 <script setup>
 import navigate from '@/views/admin/navigate/navigate.vue';
 
+
 </script>
 
 <template>
