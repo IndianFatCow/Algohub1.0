@@ -2,16 +2,20 @@
   <el-container>
     <el-aside width="20%">
       <noticeBoard></noticeBoard>
+    <!-- <template>
+      <el-affix :offset="120">
+        <el-button type="primary">Offset top 120px</el-button>
+      </el-affix>
+    </template> -->
 
     </el-aside>
     <el-container style="min-height: 105vh;">
-      <el-header>
-
+      <el-header style="max-height: 10px;" >
       </el-header>
       <el-main>
 
         <el-card shadow="always" style="height: 100%">
-          <BlogHeader />
+          <!-- <BlogHeader /> -->
           <!-- 搜索框 -->
           <el-input v-model="searchContent" placeholder="搜索内容回车确认" class="input-with-select" size="large"
             @keydown.enter="searchBlog" style="margin: 10px 0 10px 0;">
@@ -19,15 +23,39 @@
               <el-button :icon="Search" />
             </template>
           </el-input>
-          <el-divider />
-          <div v-loading="blogListLoading">
+          <!-- <el-divider /> -->
+          <!-- 博客列表 -->
+          <div v-loading="blogListLoading" class="scrollable-content" ref="scrollContainer">
             <blogCard v-for="item in blogList.items" :post="item" :key="item.instanceID" />
-            <!-- <blogCard v-if="blogList.items && blogList.items.length > 0" :post="blogList.items[0]"/> -->
           </div>
-
+            <!-- 返回顶部按钮 -->
+            <el-backtop
+            target=".scrollable-content"
+            :bottom="100"
+            :visibility-height="300"
+            :right="50"
+          >
+            <div
+              style="
+                height: 100%;
+                width: 100%;
+                background-color: #f2f5f6;
+                box-shadow: 0 0 6px rgba(0,0,0,.12);
+                text-align: center;
+                line-height: 40px;
+                color: #1989fa;
+                border-radius: 50%;
+              "
+            >
+              ↑
+            </div>
+          </el-backtop>
         </el-card>
+        
       </el-main>
       <el-footer>
+
+
       </el-footer>
     </el-container>
     <el-aside width="20%"></el-aside>
@@ -36,7 +64,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import type { TabsPaneContext } from 'element-plus'
+import type { TabsPaneContext,ElAffix } from 'element-plus'
 import blogCard from './components/blogCard.vue'
 // import BlogHeader from './components/BlogHeader.vue'
  import { getPostByIdService, queryPostsService } from '@/api/post'
@@ -45,11 +73,11 @@ import blogCard from './components/blogCard.vue'
 import { useRoute } from 'vue-router';
 import { Search } from '@element-plus/icons-vue'
 
-import show from '../compoment/show.vue'
-// import { usePostStore } from '@/stores/postStore'
-// const postStore = usePostStore()
+// import show from '../compoment/show.vue'
+import { usePostStore } from '@/stores/postStore'
+const postStore = usePostStore()
 
-
+const scrollContainer = ref(null)//滚动容器
 const { params } = useRoute()
 const searchContent = ref('')
 const blogListLoading = ref(true)
@@ -78,12 +106,26 @@ const searchBlog = async () => {//搜索博客
 
 }
 
-const handleClick = (tab: TabsPaneContext, event: Event) => {
+const handleClick = (tab: TabsPaneContext, event: Event) => { //选项卡点击事件
   console.log(tab, event)
 
 }
 </script>
 <style>
+.scrollable-content {
+  max-height: 70vh; /* 让内容区可以滚动 */
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* 额外可以加点细节，让滚动条更好看 */
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollable-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
 .demo-tabs>.el-tabs__content {
   padding: 32px;
   color: #6b778c;

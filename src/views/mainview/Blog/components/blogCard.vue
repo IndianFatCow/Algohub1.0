@@ -1,6 +1,7 @@
 <template>
 	<el-container >
       <el-header class="blog-card__content">
+        
 		<!-- 标题 -->
 		<RouterLink
 		  :to="toBlogDetailUrl"
@@ -9,10 +10,11 @@
 		  {{ post.title }}
 		</RouterLink>
 		<div class="blog-card__author">
-			<img src="@/assets/sunrise.jpg" class="blog-card__avatar" />
+			<!-- <img src="@/assets/sunrise.jpg" class="blog-card__avatar" /> -->
+      <img :src="(postUser?.avatar !== 'abandoned' && postUser != null) ? postUser.avatar : defaultAvatar" class="blog-card__avatar" />
 			<span>{{ postUser != null ? postUser.nickname : '默认昵称' }}</span>
 		</div>
-					<div class="blog-card__time">
+			<div class="blog-card__time">
 				<ClockCircleOutlined />
 				<span>{{ calculateTime() }}</span>
 			</div>
@@ -48,7 +50,7 @@
 			</el-main>
 
 			<!-- 分享 -->
-			<el-aside width="33%" class="blog-card__action">
+			<el-aside width="33%" class="blog-card__action" @click="copyCurrentUrl">
 			<Share theme="outline" size="24" fill="#333" />
 			<span class="action-text">分享</span>
 			</el-aside>
@@ -56,24 +58,28 @@
 		</el-footer>
     </el-container>
 
-
 </template>
   
   
   <script setup lang="ts">
-//   import { Comment } from '@element-plus/icons-vue'
+
   import { Like,Comment,Share} from '@icon-park/vue-next'
   import { ref, computed ,onMounted } from 'vue'
   import { useRouter, RouterLink } from 'vue-router'
-  import { useUserInfoStore } from '@/stores/userInfo'
+  // import { useUserInfoStore } from '@/stores/userInfo'
   import { likeResourceService, unlikeResourceService,getLikesCountService } from '@/api/like'
   import { getPostByIdService, queryPostsService } from '@/api/post'
   import { createCommentService, queryCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
-  import { SearchUserService } from '@/api/user'
+  import { SearchUserService,chageAvatarUrl } from '@/api/user'
+  import { usePostStore} from '@/stores/postStore'
+  
   import defaultAvatar from '@/assets/algo_logo.webp'
   import { ElMessage } from 'element-plus'
   import type { userInfo, Post, like, comment } from '@/lib/types'
-  
+  import { getCurrentInstance } from 'vue';
+
+const instance = getCurrentInstance(); // 获取当前实例链接
+const proxy = instance ? instance.proxy : null;
   
   interface Props { post: Post }  // 确保传入的博客数据包含了（post）所有的字段
   const props = defineProps<Props>() //接受父组件传参
@@ -86,18 +92,7 @@
 // 	return res.data.Items[0]
 //   }
   const postUser = ref<userInfo | null>(null)
-// const postUser = "admin"
 
-  // parse tags
-//   const adminTags: AdminTag[] = post.adminTags ? JSON.parse(post.adminTags) : []
-//   const tags = typeof post.tag === 'string' ? JSON.parse(post.tag) : post.tag || []
-  
-  // 点赞数
-//   const getLikesCount = async () => {
-// 	// console.log('post.instanceID', post.instanceID)
-// 	const res = await getLikesCountService(post.instanceID, 'post')
-// 	return res.data
-//   }
   const likeCount = ref<number>(0)
 //   const liked = ref(blog.likeState === 1)
 const liked = ref(false)
@@ -106,8 +101,11 @@ const liked = ref(false)
 onMounted(async () => {
   try {
     const userRes = await SearchUserService(post.author)
+    // console.log(userRes.data.Items[0])
     postUser.value = userRes.data.Items[0]
-	// console.log( postUser.value)
+
+    if(postUser.value && postUser.value.avatar !== "abandoned")postUser.value.avatar = chageAvatarUrl(postUser.value.avatar)
+
   } catch (e) {
     console.error('获取用户失败', e)
   }
@@ -115,7 +113,7 @@ onMounted(async () => {
   try {
     const likeRes = await getLikesCountService(post.instanceID, 'post')
     likeCount.value = likeRes.data.totalItems
-	console.log(likeCount.value)
+	// console.log(likeCount.value)
   } catch (e) {
 	console.error('获取点赞数失败', e)
   } 
@@ -158,7 +156,7 @@ onMounted(async () => {
 	  ElMessage.error('操作失败，请稍后重试')
 	}
   }
-  
+//收藏
   // toggle star (subscribe)
 //   const toggleStar = async () => {
 // 	try {
@@ -174,7 +172,16 @@ onMounted(async () => {
 // 	  ElMessage.error('操作失败，请稍后重试')
 // 	}
 //   }
-  
+//分享
+function copyCurrentUrl() {
+  const currentUrl = window.location.href;
+  navigator.clipboard.writeText(currentUrl).then(() => {
+    proxy.$message.success('链接已复制到剪贴板');
+  }).catch(err => {
+    console.error('未能复制文本: ', err);
+    proxy.$message.error('复制链接失败');
+  });
+}
   // 计算时间差
   const calculateTime = () => {
 	const postTs = new Date(post.createdAt).getTime()

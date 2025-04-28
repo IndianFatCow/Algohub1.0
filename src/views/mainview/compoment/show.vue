@@ -23,6 +23,7 @@
           </div>
         </div>
       </section>
+
     </el-main>
   </el-container>
 </template>
@@ -35,7 +36,7 @@ const goToCode = () => {
 
 <style scoped>
 .welcome-container {
-  min-height: 10vh;
+  min-height: 10vh; 
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Search ,Edit,Delete,CircleCheckFilled} from '@element-plus/icons-vue'
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router';
+import { ref, reactive, onMounted,watch } from 'vue'
+import { useRouter,useRoute } from 'vue-router';
 import type { Question } from '@/lib/types';
 import { questionStore } from '@/stores/questionStore';
 import { ElNotification } from 'element-plus'
@@ -15,18 +15,20 @@ import { ta } from 'element-plus/es/locales.mjs';
 import { getSubmitList } from '@/api/submit';
 const userInfoStore = useUserInfoStore();
 const router = useRouter()
+const route = useRoute()
 // 统一导航栏的激活状态样式
 onMounted(() => {
   emitter.emit(MittRouterNameSpace.ChangeRouter, "/problem");
 })
+// 搜索内容
+const searchContent = ref("")
 
 // 一页显示几个题目
 const page_size = 15;
 
 // 当前第几页
 const page = ref(1)
-// 搜索内容
-const searchContent = ref("")
+
 // 总题目大小
 const total_size = ref(0)
 // table加载状态
@@ -49,14 +51,9 @@ const toProblemDetail = (question: Question) => {
   judgerStore().setJudgeType(100);
   questionStore().setCurrentChoice(question);
     // 使用命名路由并传递参数
-  // router.push({
-  // name: 'questionDetail', // 使用路由名称代替硬编码的路径
-  // params: {
-  //   id: question.unique_id // 将 unique_id 作为参数传递
-  // }
-  // });
-  const path = `/questionDetail/${question.unique_id}`;
-  router.push(path);
+  // const path = `/questionDetail/${question.unique_id}`;
+  // router.push(path);
+  router.push(`/questionDetail/${question.unique_id}`);
 };
 
 // 改变页码
@@ -97,9 +94,9 @@ const searchQuestionData = async () => {
     getQuestionListData();
     return;
   }
-
-  // let result = await searchQuestion(page.value, searchContent.value);
   console.log(searchContent.value)
+  // let result = await searchQuestion(page.value, searchContent.value);
+  // console.log(searchContent.value)
   let result = await getQuestionById(searchContent.value)
   console.log(result.data)
   if (result.data === null) {
@@ -112,13 +109,26 @@ const searchQuestionData = async () => {
     getQuestionListData();
     return;
   }
+//如果路由有参数，搜索题目
+const routeSearch =  ()=>{
+  if(route.query.searchContent !== undefined) {
+  searchContent.value = route.query.searchContent as string || ""
+  searchQuestionData()
+} else {
+  searchContent.value = ""
+}
+}
+routeSearch()
+  watch(() => route.query.searchContent, (newValue) => {
+    routeSearch()
+  }, { immediate: true }); // 立即执行监听器以处理初始加载
   // total_size.value = result.data.length;
   total_size.value = 1;
 // 修改 tag 字段
   result.data.tag = result.data.tag 
       ? result.data.tag.split(',').map(tag => tag.trim()) 
       : [];
-  console.log(result.data.tag)
+  // console.log(result.data.tag)
   tableData.question_list = [result.data];
 };
 </script>

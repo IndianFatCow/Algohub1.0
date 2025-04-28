@@ -2,6 +2,7 @@
 import request from '@/utils/request.js'
 //提供调用注册接口的函数
 import axios from 'axios';
+import { ElMessage } from 'element-plus';
 // import { useNamespace } from 'element-plus';
 
 // 创建一个避免拦截器的Axios实例用于登录
@@ -19,7 +20,15 @@ export const userLoginService = (Auth: any)=>{
         headers: {
             'Authorization': Auth // 设置正确的Authorization头
         }
-    })
+    }).then(response => {
+        // 处理登录成功后的逻辑
+        // console.log("登录成功", response.data);
+        return response; // 返回登录成功的响应数据
+    }).catch(error => {
+        // 处理登录失败的逻辑
+        // console.log("登录失败", error.response.data.message);
+        ElMessage.error(error.response.data.message);
+    });
     // const response = request.post('/login', {}, {
     //     headers: {
     //         'Authorization': Auth // 设置正确的Authorization头
@@ -91,4 +100,19 @@ export const SearchUserService = (username:string, offset?:number,limit?:number)
             limit: limit !== undefined ? limit : 10   // 如果limit未提供，则使用10
         }
     })
+}
+//
+export const  chageAvatarUrl = (avatar:string)=> {
+    // 获取新的和旧的URL头
+    const oldPrefix = 'http://minio:9000';
+    const newPrefix = 'http://127.0.0.1:9000';
+
+    // 检查当前URL是否以旧的前缀开头
+    if (avatar.startsWith(oldPrefix)) {
+        // 替换为新的前缀
+        return newPrefix + avatar.substring(oldPrefix.length);
+    }
+    else{
+        return avatar
+    }
 }

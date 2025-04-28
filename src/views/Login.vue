@@ -113,7 +113,7 @@ const login = async () =>{
     
     let restoken = await userLoginService(AuthStore.getAuthHeader());
     // console.log(AuthStore.$state)
-    // console.log(restoken.data.data)
+    // console.log(restoken.data)
     //由于登录请求用到是新构造的request，返回对象中data.data是token
     token.setToken(restoken.data.data)//根据后台设置token
 
@@ -154,13 +154,13 @@ const clearForm = () => {
                 <el-form-item>
                     <h1>注册</h1>
                 </el-form-item>
-                <el-form-item prop="username">
+                <el-form-item prop="username" name="account">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username" clearable></el-input>
                 </el-form-item>
-                <el-form-item prop="email">
+                <el-form-item prop="email" name="email">
                     <el-input :prefix-icon="Message" placeholder="请输入邮箱" v-model="registerData.email" clearable></el-input>
                 </el-form-item>
-                <el-form-item prop="password">
+                <el-form-item prop="password" name="password">
                     <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="registerData.password" show-password></el-input>
                 </el-form-item>
                 <el-form-item prop="rePassword">

@@ -246,6 +246,7 @@ import type { Post, comment } from '@/lib/types'
 import useClipboard from "vue-clipboard3";
 import { useUserInfoStore } from '@/stores/userInfo'
 import commentsCard from './commentsCard.vue'
+import { subscribeUser,unsubscribeUser } from '@/api/subscribe'
 // import MarkdownRenderer from '@/components/front/MarkdownRenderer.vue'
 
 const { toClipboard } = useClipboard();
@@ -309,16 +310,13 @@ const subscribeChoice = () => {//关注
 
 const unSubscribe = () => {// 取消关注
     if (useUserInfoStore().$state.isLogin) {
-        API({
-            url: '/unSubscribe/' + blog.value?.user.id + "/" + useUserInfoStore().$state.user.id,
-            method: 'get'
-        }).then((res) => {
+        const res = unSubscribeUser(blog.value?.user.id)
             ElMessage({
                 message: res.data.message,
                 type: 'success'
             })
             location.reload()
-        })
+
     }else{
         ElMessage.error("请先登录！")
     }

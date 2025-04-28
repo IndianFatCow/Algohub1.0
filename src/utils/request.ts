@@ -7,8 +7,12 @@ import { useAuthStore } from  '@/store/store'
 import { useTokenStore } from '@/store/token'//token存储
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = '/v1';
-const instance = axios.create({baseURL})
-
+const timeout = 3000; //设置请求超时时间
+// 创建axios实例时同时设置baseURL和timeout
+const instance = axios.create({
+    baseURL: baseURL,
+    timeout: timeout
+  });
 //导入router
 import router from '@/router';
 

@@ -221,14 +221,13 @@ export default {
         let isCorrect = ref(false) // 是否正确
         let underMessage = ref('') //  提交信息
         let submiting = ref(false) // 提交中
-
         // let uid = ref(useAuthStore().$state.user.id)
         // let userName = ref(useAuthStore().$state.user.nickName)
         let qid = ref(questionStore().$state.currentChoice.unique_id)
         let questionName = ref(questionStore().$state.currentChoice.questionName)
         //      代码编译类型 = 比赛:101 , 普通:100
         let type = ref(judgerStore().$state.type)
-
+        // console.log('codeStore',useCodeStore().$state.code);
         let stepInfoMsg = ref(["等待提交", "初始化...", "编译中...", "运行中...", "等待结果"])
         let stepDoneMsg = ref(["提交完成", "初始化完毕", "编译完毕", "运行完毕", "测试完成"])
         let infoIndex = ref(0)
@@ -299,27 +298,35 @@ export default {
         title: String  // 题目名称
     },
     mounted() {
+        const codeStore = useCodeStore()   
+        // const modePath = codeStore.$state.language
+        // const modePath = codeStore.$state.language? codeStore.$state.language : this.modePath
+        // console.log('modePath',this.modePath);
         // 初始化aceEditor
         this.aceEditor = ace.edit(this.$refs.ace, {
             maxLines: 35,
             minLines: 30,
             fontSize: 14,
-            value: useCodeStore().$state.code ? useCodeStore().$state.code : '',
+            value: codeStore.$state.code ? codeStore.$state.code : '',
             theme: this.themePath,
-            mode: this.modePath,
-            wrap: this.wrap,
+            // mode: modePath? modePath : this.modePath,
+            // mode: this.modePath,
+            wrap: this.wrap, // 是否换行
             tabSize: 4
         })
+        // this.aceEditor.setValue(codeStore.$state.code ? codeStore.$state.code : '', -1) // 设置初始值
+        // this.aceEditor.getSession().setMode(modePath)
         // 激活自动提示
         this.aceEditor.setOptions({
             enableSnippets: true,
-            enableLiveAutocompletion: true,
+            enableLiveAutocompletion: true,// 是否启用实时自动补全
             enableBasicAutocompletion: true
         })
         // this.aceEditor.getSession().on('change', this.change)
           // 直接在监听器内部处理变更
         this.aceEditor.getSession().on('change', (e) => {
             const newCode = this.aceEditor.getValue();
+            // console.log("代码已更新:", newCode);
             useCodeStore().setCode(newCode); // 更新本地存储
             console.log("代码已更新并保存到本地存储");
         });
@@ -340,6 +347,8 @@ export default {
         }
     },
     methods: {
+        //初始化存储
+
         //准备调试
         async beforeDebug (){
             this.isDebug=true;
@@ -518,6 +527,8 @@ export default {
             if (selected) {
                 this.modePath = selected.path
                 this.aceEditor.getSession().setMode(this.modePath)
+                useCodeStore().setLanguage(selected.path)
+                console.log('modePath',useCodeStore().$state.language);
             }
         },
 

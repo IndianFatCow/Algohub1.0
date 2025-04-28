@@ -1,42 +1,54 @@
-<script setup>
-import { ref } from 'vue'
-import { SearchUserService } from '@/api/user'
-
-// 使用ref创建响应式数据
-const result = ref(null)
-const loading = ref(false) // 可选：用于显示加载状态
-const error = ref(null) // 可选：用于捕获并显示错误信息
-
-const search = async () => {
-    try {
-        loading.value = true
-        const username = "admin"
-        const offset = 0
-        const limit = 10
-        const res = await SearchUserService(username, offset, limit)
-        result.value = res // 将API响应赋值给响应式变量
-        console.log(result.value)
-    } catch (err) {
-        error.value = err.message || 'Failed to fetch data.'
-        console.error(error.value)
-    } finally {
-        loading.value = false
-    }
-}
-</script>
-
 <template>
-    <div>show</div>
-    <h1>1111</h1>
-    <el-button @click="search">查找列表</el-button> <!-- 注意这里不需要括号 -->
-    <div v-if="loading">Loading...</div>
-    <div v-else-if="error">{{ error }}</div>
-    <div v-else-if="result">
-        {{ result.data }} <!-- 假设API返回的数据结构包含data字段 -->
+    <div>
+      <!-- 导航栏 -->
+      <el-header class="nav-bar">
+        <h1>我的应用</h1>
+      </el-header>
+  
+      <!-- 内容区域，用于模拟滚动 -->
+      <div class="scrollable-content" ref="scrollContainer">
+        <p v-for="item in 50" :key="item">这是内容行 {{ item }}</p>
+      </div>
+  
+      <!-- 返回顶部按钮 -->
+      <el-backtop target=".scrollable-content" :bottom="100">
+        <div
+          style="
+            height: 100%;
+            width: 100%;
+            background-color: #f2f5f6;
+            box-shadow: 0 0 6px rgba(0,0,0,.12);
+            text-align: center;
+            line-height: 40px;
+            color: #1989fa;
+          "
+        >
+          UP
+        </div>
+      </el-backtop>
     </div>
-    <div v-else>No Data</div>
-</template>
-
-<style scoped>
-/* 样式可以根据需要进行调整 */
-</style>
+  </template>
+  
+  <script setup>
+  import { ref } from 'vue';
+  
+  // 内容容器引用
+  const scrollContainer = ref(null);
+  </script>
+  
+  <style scoped>
+  .nav-bar {
+    background-color: #b3c0d1;
+    color: #333;
+    text-align: center;
+    line-height: 60px;
+  }
+  
+  .scrollable-content {
+    height: 400px; /* 确保有滚动条 */
+    overflow-y: auto;
+    padding: 15px;
+    border: 1px solid #ccc;
+  }
+  </style>
+  

@@ -36,13 +36,23 @@ const handleSearch = () => {
     return;
   }
   // 跳转到搜索结果页面
-  
+  switch (searchType.value) {
+    case 'users':
+      router.push(`/question-bank?searchContent=${searchText.value}`);
+      break;
+    case 'problems':
+      router.push(`/question-bank?searchContent=${searchText.value}`);
+      break;
+    case 'blogs':
+      router.push(`/question-bank?searchContent=${searchText.value}`);
+      break;
+  }
 };
 
 import miniCenter from './userCenter/miniCenter.vue';
 </script>
 <template>
-  <el-container>
+  <el-container style="height: 100vh;overflow: hidden;">
     <!-- 顶部栏 -->
     <el-header class="header">
       <div class="nav-left"  >
@@ -92,7 +102,7 @@ import miniCenter from './userCenter/miniCenter.vue';
     </el-header>
     
     <!-- 主体内容 -->
-    <el-main>
+    <el-main class="main-content">
       <router-view></router-view>
     </el-main>
   </el-container>
@@ -139,56 +149,46 @@ import miniCenter from './userCenter/miniCenter.vue';
   border-radius: 6px;
   font-size: 14px;
 }
+/* 确保 el-container 正确撑满视口 */
+.el-container {
+  height: 100vh;
+  overflow: hidden; /* 防止父容器溢出 */
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden !important; /* 强制去掉滚动条 */
+  padding: 0;
+  height: calc(100vh - 60px); /* 减去 header 高度，保持页面铺满 */
+}
+
+
+/* 新增：全局样式覆盖 el-main */
+:deep(.el-main) {
+  height: calc(100vh - 60px); /* 减去 header 的高度（假设 header 高度为 60px） */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+:deep(.el-main::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+:deep(.el-main::-webkit-scrollbar-thumb) {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+:deep(.el-main::-webkit-scrollbar-thumb:hover) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* 确保 el-container 撑满视口 */
+:deep(.el-container) {
+  height: 100vh;
+  overflow: hidden;
+}
 </style>
-
-<!-- <style lang="scss" scoped>
-  /* 让主体内容居中，并限制最大宽度 */
-  .el-main {
-    display: flex; /* 使用 flex 让内容居中 */
-    flex-direction: column; /* 让内容纵向排列 */
-    align-items: center; /* 水平居中 */
-    justify-content: center; /* 垂直居中（适用于高度自适应的场景） */
-    max-width: 800px; /* 限制最大宽度，防止内容过宽 */
-    margin: 20px auto; /* 上下 20px，左右自动居中 */
-    padding: 20px; /* 添加适当内边距，防止内容贴边 */
-  }
-
-  /* 个人信息卡片 */
-  .el-card {
-    width: 100%; /* 让卡片宽度自适应父容器 */
-    padding: 20px; /* 让卡片内部内容有间距 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 添加轻微阴影，增加层次感 */
-    border-radius: 8px; /* 圆角优化 UI */
-  }
-
-  /* 个人信息容器 */
-  .profile-container {
-    display: flex; /* 让头像和信息并排 */
-    align-items: center; /* 让头像和文字对齐 */
-    gap: 15px; /* 头像和文字之间的间距 */
-  }
-
-  /* 头像样式 */
-  .el-avatar {
-    border: 2px solid #ddd; /* 添加边框，让头像更明显 */
-  }
-
-  /* 个人信息文本部分 */
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  /* 标签页样式 */
-  .el-tabs {
-    width: 100%; /* 让 Tabs 组件自适应 */
-    margin-top: 20px; /* 增加与上方的间距 */
-  }
-
-  /* 题目卡片样式 */
-  .el-tab-pane .el-card {
-    margin-top: 10px; /* 让题目列表有一些间距 */
-  }
-
-</style> -->
