@@ -52,7 +52,7 @@ const handleSearch = () => {
 import miniCenter from './userCenter/miniCenter.vue';
 </script>
 <template>
-  <el-container style="height: 100vh;overflow: hidden;">
+  <el-container class="layout">
     <!-- 顶部栏 -->
     <el-header class="header">
       <div class="nav-left"  >
@@ -103,12 +103,19 @@ import miniCenter from './userCenter/miniCenter.vue';
     
     <!-- 主体内容 -->
     <el-main class="main-content">
-      <router-view></router-view>
+      <div class="router-view-container"><router-view></router-view></div>
+      
     </el-main>
   </el-container>
 </template>
 
 <style scoped>
+.layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;       /* 整体不出现双滚动 */
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -123,15 +130,7 @@ import miniCenter from './userCenter/miniCenter.vue';
   align-items: center;
 }
 
-/* .nav-center {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
 
-.search-bar {
-  width: 250px;
-} */
  /* 居中搜索栏 */
 .nav-center {
   position: absolute;
@@ -152,20 +151,25 @@ import miniCenter from './userCenter/miniCenter.vue';
 /* 确保 el-container 正确撑满视口 */
 .el-container {
   height: 100vh;
-  overflow: hidden; /* 防止父容器溢出 */
+  /* overflow: hidden; 防止父容器溢出 */
 }
 
 .main-content {
-  flex: 1;
+  flex: 1 1auto;
   overflow: hidden !important; /* 强制去掉滚动条 */
   padding: 0;
-  height: calc(100vh - 60px); /* 减去 header 高度，保持页面铺满 */
+  height: 100%;
+  
 }
-
-
+/* 4. router-view-container 只要能撑满并留出底部空间即可 */
+.router-view-container {
+  min-height: 100%;
+  padding: 16px;          /* 可选：给内容区留点内边距 */
+  box-sizing: border-box;
+}
 /* 新增：全局样式覆盖 el-main */
 :deep(.el-main) {
-  height: calc(100vh - 60px); /* 减去 header 的高度（假设 header 高度为 60px） */
+  /* height: calc(100vh - 60px); 减去 header 的高度（假设 header 高度为 60px） */
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -187,8 +191,8 @@ import miniCenter from './userCenter/miniCenter.vue';
 }
 
 /* 确保 el-container 撑满视口 */
-:deep(.el-container) {
+/* :deep(.el-container) {
   height: 100vh;
   overflow: hidden;
-}
+} */
 </style>

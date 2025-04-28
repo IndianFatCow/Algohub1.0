@@ -16,7 +16,8 @@ import showVue from '@/views/mainview/compoment/show.vue'//项目展示
 import userpage from '@/views/mainview/homepage.vue'
 import homepage from '@/views/mainview/Blog/home.vue'
 // import questionBank from '@/views/admin/contentAdmin/show.vue'
-import profile from '@/views/admin/contentAdmin/show.vue'
+// import profile from '@/views/admin/contentAdmin/show.vue'
+import profile from '@/views/mainview/userProfile/profile.vue'//个人中心
 import qa from '@/views/admin/contentAdmin/show.vue'
 import visualAlgo from '@/views/admin/contentAdmin/show.vue'
 
@@ -58,7 +59,7 @@ const routes = [
                 {path: '/show', component: showVue},
                 {path: '/home', component: homepage},
                 {path: '/question-bank', component: questionBank ,
-                    // 将查询参数 q 作为 props.searchQuery 传入
+                // 将查询参数 q 作为 props.searchQuery 传入
                 props: route => ({ searchQuery: route.query.q || '' })
                 },
                 {path: '/questionDetail/:id', component: questionDetail},

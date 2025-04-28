@@ -1,5 +1,6 @@
 <template>
 	<el-container >
+    <el-divider  />
       <el-header class="blog-card__content">
         
 		<!-- 标题 -->
@@ -68,8 +69,8 @@
   import { useRouter, RouterLink } from 'vue-router'
   // import { useUserInfoStore } from '@/stores/userInfo'
   import { likeResourceService, unlikeResourceService,getLikesCountService } from '@/api/like'
-  import { getPostByIdService, queryPostsService } from '@/api/post'
-  import { createCommentService, queryCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
+  // import { getPostByIdService, queryPostsService } from '@/api/post'
+  // import { createCommentService, queryCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
   import { SearchUserService,chageAvatarUrl } from '@/api/user'
   import { usePostStore} from '@/stores/postStore'
   
@@ -77,14 +78,14 @@
   import { ElMessage } from 'element-plus'
   import type { userInfo, Post, like, comment } from '@/lib/types'
   import { getCurrentInstance } from 'vue';
-
+  
 const instance = getCurrentInstance(); // 获取当前实例链接
 const proxy = instance ? instance.proxy : null;
   
   interface Props { post: Post }  // 确保传入的博客数据包含了（post）所有的字段
   const props = defineProps<Props>() //接受父组件传参
   const post = props.post
-  console.log(post)
+  // console.log(post)
 
 //   const postUseravatar = computed(() => userInfoStore.userinfo.avatar)
 //   const getuser = async () => {

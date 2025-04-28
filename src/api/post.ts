@@ -14,11 +14,12 @@ export const createPostService = (postData: any) => {
  * @param {string} title - 帖子标题搜索条件，可选
  * @param {string} content - 帖子内容搜索条件，可选
  */
-export const queryPostsService = (limit = 10, offset = 0, title?:string, content?:string) => {
+export const queryPostsService = (limit = 10, offset = 0,author?:string, title?:string, content?:string) => {
     return request.get('/post', {
         params: {
             limit,
             offset,
+            author: author,
             title: title,
             content: content
         }

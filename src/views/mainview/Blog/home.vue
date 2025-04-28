@@ -24,9 +24,12 @@
             </template>
           </el-input>
           <!-- <el-divider /> -->
+          <!-- <el-divider content-position="left">博客列表</el-divider> -->
           <!-- 博客列表 -->
           <div v-loading="blogListLoading" class="scrollable-content" ref="scrollContainer">
-            <blogCard v-for="item in blogList.items" :post="item" :key="item.instanceID" />
+            <blogCard v-for="item in blogList" :post="item" :key="item.instanceID" />
+            <!-- <blogCard v-for="item in postStore.posts" :post="item" :key="item.instanceID" /> -->
+            <!-- <el-divider></el-divider> -->
           </div>
             <!-- 返回顶部按钮 -->
             <el-backtop
@@ -88,21 +91,24 @@ const blogList = ref<any>([])
 
   
 const getBlogList = async () => {
-  const res = await queryPostsService(10, 0, undefined , undefined);
+  const res = await queryPostsService(10, 0,undefined , undefined , undefined);
   // console.log(res.data);
-  blogList.value = res.data
+  // postStore.setPosts(res.data.items);
+  // console.log(postStore.posts);
+  blogList.value = res.data.items
   // console.log(blogList.value);
-  // console.log(blogList.value.items[0]);
   blogListLoading.value = false
 }
 getBlogList()
 const searchBlog = async () => {//搜索博客
   //实现模糊搜索，搜索标题和内容
     blogListLoading.value = true
-    const res = await queryPostsService(10, 0, searchContent.value, undefined);
+    const res = await queryPostsService(10, 0,undefined, searchContent.value, undefined);
+    // postStore.setPosts(res.data.items);
+    // console.log(postStore.posts);
     blogList.value = res.data.data
     blogListLoading.value = false
-    console.log(blogList.value);
+
 
 }
 
