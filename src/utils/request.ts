@@ -5,13 +5,20 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from  '@/store/store'
 import { useTokenStore } from '@/store/token'//token存储
+import JSONBig from 'json-bigint';
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = '/v1';
 const timeout = 3000; //设置请求超时时间
 // 创建axios实例时同时设置baseURL和timeout
 const instance = axios.create({
     baseURL: baseURL,
-    timeout: timeout
+    timeout: timeout,
+      // 使用 json-bigint 解析响应数据
+    transformResponse: [
+    (data) => {
+      return JSONBig.parse(data); // 自动将大整数转为字符串
+    }
+  ]
   });
 //导入router
 import router from '@/router';

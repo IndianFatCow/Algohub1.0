@@ -15,7 +15,7 @@ const selectedFile = ref(null); // 选中的文件
 
 import { useTokenStore } from '@/store/token'
 const tokenStore = useTokenStore()
-console.log('tokenStore is', tokenStore.$state.token)
+// console.log('tokenStore is', tokenStore.$state.token)
 // 修改头像上传函数
 const updateAvatar = async () => {
  
@@ -43,6 +43,7 @@ const updateAvatar = async () => {
     // 生成预览 URL
     // URL.revokeObjectURL(userInfoStore.userinfo.avatar); // 清除之前的 URL
     // const blobUrl = URL.createObjectURL(selectedFile.value);
+    console.log(result);
     userInfoStore.userinfo.avatar = result.data.sub_url; // 更新头像图片的 URL
     userInfoStore.chageAvatarUrl();
     imgUrl.value = userInfoStore.userinfo.avatar; // 更新头像图片的 URL

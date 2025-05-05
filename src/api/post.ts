@@ -28,7 +28,7 @@ export const queryPostsService = (limit = 10, offset = 0,author?:string, title?:
 
 //  根据ID获取帖子详情
 
-export const getPostByIdService = (id:number) => {
+export const getPostByIdService = (id?:string) => {
     return request.get(`/post/${id}`);
 };
 

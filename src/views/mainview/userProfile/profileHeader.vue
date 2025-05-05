@@ -12,11 +12,11 @@
     <div class="profile-main">
       <!-- 头像 + 基本信息 -->
       <div class="left">
-        <el-avatar :src="avatarUrl" size="80" />
+        <el-avatar :src="userStore.avatar"  @click="()=>{router.push('/userCenter/avatar')}" style="cursor: pointer" shape="square" class="avatar"/>
         <div class="info">
-          <h2 class="name">{{ username }}</h2>
-          <p class="bio">{{ bio }}</p>
-          <el-button type="primary" size="small" @click="onEditProfile">
+          <h2 class="name">{{ userStore.nickname }}</h2>
+          <p class="bio">{{ userStore.bio }}</p>
+          <el-button type="primary" size="small" @click="onEditProfile" v-if="isUser">
             编辑个人资料
           </el-button>
         </div>
@@ -48,24 +48,42 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits,ref } from 'vue'
 import { useUserInfoStore } from '@/stores/userInfo'
+import { useRouter,useRoute } from 'vue-router'
+const router = useRouter()
+const route = useRoute()
+const isUser = ref(false)
+// 获取路由参数（动态参数）
+const username = route.params.username
+const userStore = useUserInfoStore().userinfo
+if(username === userStore.username ){
+  isUser.value = true
+}
 const props = defineProps({
-  avatarUrl: { type: String, default: '' },
-  username: { type: String, default: '前度' },
-  bio: {
-    type: String,
-    default: '互联网冲浪好手，关注世间万物'
-  },
-  followingCount: { type: Number, default: 123 },
-  followersCount: { type: Number, default: 456 },
   articleCount: { type: Number, default: 78 },
-  ipLocation: { type: String, default: '江苏' }
 })
+  const followersCount = ref(0)
+  const followingCount = ref(0)
+
+  const ipLocation = ref('')
+// 需要做跨域处理
+// 使用 fetch 获取 IP 信息
+fetch('http://ip-api.com/json/')
+  .then(response => response.json())
+  .then(data => {
+    console.log('IP 属地信息:', data);
+    // 示例输出：{ city: "Beijing", regionName: "Beijing", country: "China", ... }
+    // alert(`您来自：${data.city}, ${data.regionName}, ${data.country}`);
+    ipLocation.value = ( data.country === 'China') ? data.regionName : data.country
+  })
+  .catch(error => console.error('获取 IP 属地失败:', error));
 
 const emit = defineEmits(['edit-profile'])
 const onEditProfile = () => {
-  emit('edit-profile')
+  // emit('edit-profile')
+
+  router.push('/userCenter/info')
 }
 </script>
 
@@ -78,7 +96,11 @@ const onEditProfile = () => {
 /* 灰色背景区 */
 .header-bg {
   height: 80px;
-  background-color: #c0c0c0;
+  /* background-color: #dbdada; */
+  /* background-image: url('@/assets/algo_logo.webq'); */
+  /* background-image: url('@/assets/sunrise.jpg'); */
+  background-image: url('@/assets/frosty-night.jpg');
+  background-size: cover;
   position: relative;
 }
 
@@ -100,7 +122,14 @@ const onEditProfile = () => {
 /* 左侧：头像 + 文字 */
 .left {
   display: flex;
-  align-items: center;
+  align-items: center; 
+}
+.avatar {
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+  width: 80px;
+  height: 80px;
 }
 .info {
   margin-left: 16px;

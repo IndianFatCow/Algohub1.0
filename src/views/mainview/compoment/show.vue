@@ -45,7 +45,8 @@ const goToCode = () => {
 .hero-section {
   width: 100%;
   background-color: #fff;
-  padding: 4rem 2rem;
+  /*  8rem调整上边距 2rem; 调整左右边距*/
+  padding: 8rem 2rem;
 }
 
 .content {

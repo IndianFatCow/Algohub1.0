@@ -2,11 +2,11 @@
 import request from '@/utils/request'
 
 //订阅用户
-export const subscribeUser = (username: string) => {
+export const subscribeUser = (username?: string) => {
     return request.post(`/subscribe/user/${username}`)
 }
 //取消订阅
-export const unsubscribeUser = (username: string) => {
+export const unsubscribeUser = (username?: string) => {
     return request.delete(`/subscribe/user/${username}`)
 }
 //获取订阅列表

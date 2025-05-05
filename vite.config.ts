@@ -8,7 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    // vueDevTools(),
   ],
   resolve: {
     alias: {
@@ -20,7 +20,8 @@ export default defineConfig({
     port: 5174,//前端端口
     proxy: {
       '/v1': {
-        target: 'https://127.0.0.1:8443/v1',
+        target: 'https://192.168.1.166:8443/v1',
+        // target: 'https://127.0.0.1:8443/v1',
         // target: 'http://localhost:8080', 
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/v1/, ''),

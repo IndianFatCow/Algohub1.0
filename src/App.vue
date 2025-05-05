@@ -13,11 +13,12 @@
 </style> -->
 <script setup>
 import navigate from '@/views/admin/navigate/navigate.vue';
-
+import { useUserInfoStore} from '@/stores/userInfo';
+const userStore = useUserInfoStore();
 </script>
 
 <template>
-  <navigate />
+  <navigate v-if="userStore.isAdmin" />
   <router-view></router-view>
 </template>
 

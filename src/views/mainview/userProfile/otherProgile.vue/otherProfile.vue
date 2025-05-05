@@ -14,7 +14,7 @@
           <el-card >
                     <!-- 单一滚动容器，包含 Header, Tabs, 列表 -->
         <div
-          ref="scrollContainer"class="scrollable-content"
+          ref="scrollContainer"
           style="height: 100vh; overflow: auto;"
           v-loading="blogListLoading"
           v-infinite-scroll="loadMore"
@@ -22,7 +22,7 @@
           :infinite-scroll-disabled="noMore"
           :infinite-scroll-distance="100"
         >
-          <Header   :articleCount="articleCount"></Header>
+          <Header  class="scrollable-content" :articleCount="articleCount"></Header>
           <!-- 顶部导航栏 -->
           <el-tabs v-model="activeTab" class="tab-container" @tab-change="handleTabChange">
             <el-tab-pane label="动态" name="dynamic"> </el-tab-pane>
@@ -187,14 +187,14 @@ const loadMore = async () => {
       type: 'success',
     })
     const res = (await getUserLikesService(userStore.userinfo.username,pageSize.value,offset))as { data: UserLikeResponse }
-    // console.log('获取点赞列表:', res.data)
+    console.log('获取点赞列表:', res.data)
     const likeItems = res.data.items || []
     totalSize.value = res.data.totalItems
     // console.log(likeItems)
     // 按 instanceID 顺序逐个请求文章详情
     for (const like of likeItems) {
-      // console.log('like:', like.item_id)
-      const postRes = await getPostByIdService(like.item_id.toString())
+      console.log('like:', like.instanceID)
+      const postRes = await getPostByIdService(like.instanceID)
       if (postRes.data) {
         likedPosts.value.push(postRes.data)
       }
@@ -235,10 +235,9 @@ onMounted(() => {
 
   const handleTabChange = (tab: string) => {
     activeTab.value = tab
-    console.log('当前选项卡:', tab)
+    // console.log('当前选项卡:', tab)
     if(tab === 'dynamic'){
       // blogList.value = []
-      loadMore()
       userPage.value = 1
       totalSize.value = 0
       noMore.value = false
@@ -248,10 +247,6 @@ onMounted(() => {
         message: '获取点赞',
         type: 'success',
       })
-      userPage.value = 1
-      totalSize.value = 0
-      noMore.value = false
-      // likedPosts.value = []
       loadMore()
     } else if (tab === 'following') {
       // getFollowing()

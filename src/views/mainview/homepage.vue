@@ -159,7 +159,8 @@ import miniCenter from './userCenter/miniCenter.vue';
   overflow: hidden !important; /* 强制去掉滚动条 */
   padding: 0;
   height: 100%;
-  
+  /* background-image: url('@/assets/frosty-night.jpg');
+  background-size: cover; */
 }
 /* 4. router-view-container 只要能撑满并留出底部空间即可 */
 .router-view-container {

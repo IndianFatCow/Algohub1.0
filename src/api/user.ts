@@ -101,11 +101,12 @@ export const SearchUserService = (username:string, offset?:number,limit?:number)
         }
     })
 }
-//
+// 修改头像URL
 export const  chageAvatarUrl = (avatar:string)=> {
     // 获取新的和旧的URL头
     const oldPrefix = 'http://minio:9000';
-    const newPrefix = 'http://127.0.0.1:9000';
+    // const newPrefix = 'http://127.0.0.1:9000';
+    const newPrefix = 'http://192.168.1.166:9000';
 
     // 检查当前URL是否以旧的前缀开头
     if (avatar.startsWith(oldPrefix)) {
@@ -116,3 +117,4 @@ export const  chageAvatarUrl = (avatar:string)=> {
         return avatar
     }
 }
+// 需要做跨域处理

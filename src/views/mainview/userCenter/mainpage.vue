@@ -19,13 +19,14 @@ import {useUserInfoStore} from '@/stores/userInfo'
 
 const userInfo = useUserInfoStore()
 const getUserInfo = async ()=>{
-    let result = await userInfoService(userInfo.username);
-    // console.log("前台",result);
+    console.log(userInfo.userinfo.username);
+    let result = await userInfoService(userInfo.userinfo.username);
+    console.log(result);
     userInfo.userinfo.value = result.data;
     // console.log(authStore.userInfo.username);
 }
 getUserInfo();
-userInfo.chageAvatarUrl()//设置用户头像
+// userInfo.chageAvatarUrl()//设置用户头像
 //头像条目点击后的处理
 import { useRouter } from 'vue-router'
 const router = useRouter();

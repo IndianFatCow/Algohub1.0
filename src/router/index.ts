@@ -14,7 +14,6 @@ import Articlecategoryvue from '@/views/admin/contentAdmin/questionManage.vue'//
 //uesr页面和子页面
 import showVue from '@/views/mainview/compoment/show.vue'//项目展示
 import userpage from '@/views/mainview/homepage.vue'
-import homepage from '@/views/mainview/Blog/home.vue'
 // import questionBank from '@/views/admin/contentAdmin/show.vue'
 // import profile from '@/views/admin/contentAdmin/show.vue'
 import profile from '@/views/mainview/userProfile/profile.vue'//个人中心
@@ -57,13 +56,15 @@ const routes = [
         children://配置子路由
         [       
                 {path: '/show', component: showVue},
-                {path: '/home', component: homepage},
+                {path: '/home', component: home},
+                { path: '/blogDetail/:id', component: blogDetail },
                 {path: '/question-bank', component: questionBank ,
                 // 将查询参数 q 作为 props.searchQuery 传入
                 props: route => ({ searchQuery: route.query.q || '' })
                 },
                 {path: '/questionDetail/:id', component: questionDetail},
                 {path: '/profile', component: profile},
+                {path: '/profile/:username', component: profile},
                 {path: '/qa', component: qa},
                 {path: '/visual-algo', component: visualAlgo}      
         ]},
@@ -75,8 +76,7 @@ const routes = [
             {path: '/userCenter/repassword', component: userResetpasswordvue}
         ]
     },
-    { path: '/blog', component: home },
-    { path: '/blogDetail/:id', component: blogDetail },
+    
     // { path: '/:catchAll(.*)', component: NotFound ,meta:{ hidden: true }},//404页面
 ]
 

@@ -9,6 +9,19 @@ import '@icon-park/vue-next/styles/index.css'; // 引入字节跳动图标库
 import { createPinia } from 'pinia'
 import { createPersistedState } from 'pinia-plugin-persistedstate'
 
+// v-md-editor Markdown组件
+import VMdEditor from '@kangc/v-md-editor'
+import '@kangc/v-md-editor/lib/style/base-editor.css'
+import githubTheme from '@kangc/v-md-editor/lib/theme/github'
+import '@kangc/v-md-editor/lib/theme/style/github.css'
+// highlightjs 核心代码
+import hljs from 'highlight.js'
+
+VMdEditor.use(githubTheme,{
+    Hljs:hljs
+})
+
+
 import App from './App.vue'
 
 const app = createApp(App)
@@ -19,4 +32,5 @@ app.use(ElementPlus)
 app.use(pinia)//管理全局状态
 app.use(router)//管理路由
 app.use(ace)//ace编辑器
+app.use(VMdEditor)
 app.mount('#app')

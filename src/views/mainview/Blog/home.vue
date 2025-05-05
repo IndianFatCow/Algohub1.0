@@ -1,12 +1,6 @@
 <template>
   <el-container>
     <el-aside width="20%">
-      <noticeBoard></noticeBoard>
-    <!-- <template>
-      <el-affix :offset="120">
-        <el-button type="primary">Offset top 120px</el-button>
-      </el-affix>
-    </template> -->
 
     </el-aside>
     <el-container style="min-height: 105vh;">
@@ -14,7 +8,14 @@
       </el-header>
       <el-main>
 
-        <el-card shadow="always" style="height: 100%">
+        <el-card shadow="always" style="height: 100%" >
+        <div class="scrollable-content" style="height: 100vh; overflow: auto;"
+          v-loading="blogListLoading"
+          v-infinite-scroll="loadMore"
+          :infinite-scroll-container="scrollContainer"
+          :infinite-scroll-disabled="noMore"
+          :infinite-scroll-distance="100"
+          >
           <!-- <BlogHeader /> -->
           <!-- 搜索框 -->
           <el-input v-model="searchContent" placeholder="搜索内容回车确认" class="input-with-select" size="large"
@@ -23,11 +24,9 @@
               <el-button :icon="Search" />
             </template>
           </el-input>
-          <!-- <el-divider /> -->
-          <!-- <el-divider content-position="left">博客列表</el-divider> -->
           <!-- 博客列表 -->
-          <div v-loading="blogListLoading" class="scrollable-content" ref="scrollContainer">
-            <blogCard v-for="item in blogList" :post="item" :key="item.instanceID" />
+          <div   >
+            <blogCard v-for="item in blogList" :post="item" :key="item.ID" />
             <!-- <blogCard v-for="item in postStore.posts" :post="item" :key="item.instanceID" /> -->
             <!-- <el-divider></el-divider> -->
           </div>
@@ -53,6 +52,7 @@
               ↑
             </div>
           </el-backtop>
+        </div>
         </el-card>
         
       </el-main>
@@ -78,18 +78,50 @@ import { Search } from '@element-plus/icons-vue'
 
 // import show from '../compoment/show.vue'
 import { usePostStore } from '@/stores/postStore'
+import { onMounted } from 'vue';
 const postStore = usePostStore()
 
 const scrollContainer = ref(null)//滚动容器
 const { params } = useRoute()
 const searchContent = ref('')
-const blogListLoading = ref(true)
+const blogListLoading = ref(false)
 const activeName = ref('first')
 const blogList = ref<any>([])
 
 // const userStore = useUserInfoStore()
+const pageSize = ref(5) //每页显示的数量
+const userPage = ref(1) //当前页码
+const totalSize = ref(0) //总数据量
+const noMore = ref(false) //是否还有更多数据
+const loadMore = async () => {
+  console.log('加载更多数据...')
+  if (blogListLoading.value || noMore.value) return
+  blogListLoading.value = true
 
-  
+  const offset = (userPage.value - 1) * pageSize.value
+    const res = await queryPostsService(
+      pageSize.value,
+      offset
+    )
+    const items = res.data.items || []
+    blogList.value.push(...items)
+    totalSize.value = res.data.totalItems
+    if (items.length < pageSize.value) {
+      noMore.value = true
+    }
+  if (blogList.value.length >= totalSize.value) {
+    noMore.value = true
+  } else {
+    userPage.value++
+  }
+
+  blogListLoading.value = false
+}
+onMounted(() => {
+  // console.log('mounted')
+  // getBlogList()
+  loadMore()
+})
 const getBlogList = async () => {
   const res = await queryPostsService(10, 0,undefined , undefined , undefined);
   // console.log(res.data);
@@ -99,7 +131,7 @@ const getBlogList = async () => {
   // console.log(blogList.value);
   blogListLoading.value = false
 }
-getBlogList()
+// getBlogList()
 const searchBlog = async () => {//搜索博客
   //实现模糊搜索，搜索标题和内容
     blogListLoading.value = true
@@ -119,13 +151,13 @@ const handleClick = (tab: TabsPaneContext, event: Event) => { //选项卡点击�
 </script>
 <style>
 .scrollable-content {
-  max-height: 70vh; /* 让内容区可以滚动 */
+  max-height: 100vh; 
   overflow-y: auto;
   padding: 10px;
 }
 
 /* 额外可以加点细节，让滚动条更好看 */
-.scrollable-content::-webkit-scrollbar {
+/* .scrollable-content::-webkit-scrollbar {
   width: 6px;
 }
 .scrollable-content::-webkit-scrollbar-thumb {
@@ -137,6 +169,6 @@ const handleClick = (tab: TabsPaneContext, event: Event) => { //选项卡点击�
   color: #6b778c;
   font-size: 32px;
   font-weight: 600;
-}
+} */
 </style>
   

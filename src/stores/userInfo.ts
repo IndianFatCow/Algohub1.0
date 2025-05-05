@@ -60,7 +60,8 @@ export const useUserInfoStore = defineStore("userinfo", {
         chageAvatarUrl( ) {
             // 获取新的和旧的URL头
             const oldPrefix = 'http://minio:9000';
-            const newPrefix = 'http://127.0.0.1:9000';
+            // const newPrefix = 'http://127.0.0.1:9000';
+            const newPrefix = 'http://192.168.1.166:9000';
 
             // 检查当前URL是否以旧的前缀开头
             if (this.userinfo.avatar.startsWith(oldPrefix)) {

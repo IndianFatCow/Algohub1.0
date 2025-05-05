@@ -36,10 +36,15 @@ const loading = ref(true)
 // //是否通过
 const isPass = ref(false)
 const ifPass = async (unique_id: string) => {
-  const res = await getSubmitList( unique_id, 1, 1)
-  if(res.data.status == "peding") return 
-  if(res.data.status == "accepted") isPass.value = true
-}
+  const res = await getSubmitList(unique_id, 0, 1);
+  return res.data.items[0]?.status === "accepted";
+};
+
+const passStatus = reactive<Record<string, boolean>>({});
+
+const updatePassStatus = async (unique_id: string) => {
+  passStatus[unique_id] = await ifPass(unique_id);
+};
 // 题目列表
 const tableData = reactive({
   question_list: [] as Question[],
@@ -67,12 +72,14 @@ const changePage = (new_page: number) => {
 const getQuestionListData = async () => {
   loading.value = true;
   const offset = (page.value - 1) * page_size;
-  let result;
-  result = await getQuestionList(offset,page_size);
+  let result = await getQuestionList(offset,page_size);
   loading.value = false;
   total_size.value = result.data.totalItems;
   
-  // 转换 tag 字段
+  tableData.question_list = result.data.items;
+  tableData.question_list.forEach((question) => {
+    updatePassStatus(question.unique_id);
+  });
   result.data.items = result.data.items.map((item:Question) => ({
     ...item,
     tag: item.tag ? item.tag.split(',').map(tag => tag.trim()) : [] // 将字符串转换为数组
@@ -132,32 +139,30 @@ routeSearch()
   tableData.question_list = [result.data];
 };
 </script>
+
 <template>
-    <el-container>
-      <el-aside width="10%">
+    <!-- <el-container> -->
+      <el-aside width="7%">
   
       </el-aside>
-      <el-container style="min-height: 105vh;">
-        <el-header>
-  
-        </el-header>
+      <!-- <el-container style="min-height: 105vh;"> -->
+
         <el-main>
   
-          <el-card shadow="always" style="height: 100%">
+          <el-card shadow="always" style="height: 100%;">
             <!-- 搜索框 -->
             <el-input v-model="searchContent" placeholder="搜索题目" class="input-with-select" size="large"
               @keydown.enter="searchQuestionData">
-              <template #prepend>
+              <!-- <template #prepend> -->
                 <el-button :icon="Search" @click="searchQuestionData" />
-              </template>
             </el-input>
-
+            <el-scrollbar  style="height: 70vh; margin-top: 10px;">
             <!-- 题目列表 -->
             <el-table :data="tableData.question_list" style="width: 100%" v-loading="loading" table-layout="fixed"
               element-loading-text="加载中..." >
-              <el-table-column label="#" style="width: 10%;"  #default="scope">
+              <el-table-column label="#" style="max-width: 10%;"  #default="scope">
                 {{ scope.row.ID }}
-                <el-icon v-if="ifPass(scope.row.unique_id),isPass.value==true"><CircleCheckFilled /></el-icon>
+                <el-icon  v-if="passStatus[scope.row.unique_id]"><CircleCheckFilled /></el-icon>
 
               </el-table-column>
               <el-table-column label="题目" style="width: 20%;">
@@ -165,7 +170,7 @@ routeSearch()
                   <el-button type="primary" @click="toProblemDetail(scope.row)" link>{{ scope.row.title}}</el-button>
                 </template>
               </el-table-column>
-              <el-table-column label="标签" style="width: 50%;" #default="scope">
+              <el-table-column label="标签" style="width: 50%;"  #default="scope">
                 <el-tag v-for="tag in scope.row.tag" :key="tag" class="ml-2">{{ tag }}</el-tag>
               </el-table-column>
               <el-table-column #default="scope" label="通过率" style="width: 10%;">
@@ -183,18 +188,18 @@ routeSearch()
             </el-table>
             <!-- 分页 -->
             <el-pagination class="pagination" background layout="prev, pager,n ext" :total="total_size"
-              :page-size="page_size" @current-change="changePage" />
+              :page-size="page_size" @current-change="changePage" :current-page="page" />
+            </el-scrollbar>
   
   
           </el-card>
   
   
         </el-main>
-        <el-footer>
-        </el-footer>
-      </el-container>
-      <el-aside width="10%"></el-aside>
-    </el-container>
+
+      <!-- </el-container> -->
+      <el-aside width="7%"></el-aside>
+    <!-- </el-container> -->
   </template>
     
   

@@ -30,7 +30,7 @@
 				src="@/assets/sunflower.jpg"
 			/>
 		<el-text class="blog-card__excerpt">
-		  <RouterLink :to="toBlogDetailUrl">
+		  <RouterLink :to="toBlogDetailUrl" tag="a" target="_blank">
 			{{ post.content.slice(0, 35) + '……' }}
 		  </RouterLink>
 		</el-text>
@@ -47,11 +47,11 @@
 			<!-- 评论 -->
 			<el-main class="blog-card__action">
 			<Comment theme="outline" size="24" fill="#333" />
-			<span class="action-text">{{ 111 }}</span>
+			<span class="action-text">{{ commentCount }}</span>
 			</el-main>
 
 			<!-- 分享 -->
-			<el-aside width="33%" class="blog-card__action" @click="copyCurrentUrl">
+			<el-aside width="33%" class="blog-card__action" @click="copyCurrentUrl(post.instanceID)">
 			<Share theme="outline" size="24" fill="#333" />
 			<span class="action-text">分享</span>
 			</el-aside>
@@ -68,9 +68,9 @@
   import { ref, computed ,onMounted } from 'vue'
   import { useRouter, RouterLink } from 'vue-router'
   // import { useUserInfoStore } from '@/stores/userInfo'
-  import { likeResourceService, unlikeResourceService,getLikesCountService } from '@/api/like'
+  import { likeResourceService, unlikeResourceService,getLikesCountService,getUserisLikedService } from '@/api/like'
   // import { getPostByIdService, queryPostsService } from '@/api/post'
-  // import { createCommentService, queryCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
+  import { createCommentService, postCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
   import { SearchUserService,chageAvatarUrl } from '@/api/user'
   import { usePostStore} from '@/stores/postStore'
   
@@ -98,21 +98,29 @@ const proxy = instance ? instance.proxy : null;
 //   const liked = ref(blog.likeState === 1)
 const liked = ref(false)
 
-  
+const commentCount = ref<number>(0)
 onMounted(async () => {
   try {
+    // 获取当前用户
     const userRes = await SearchUserService(post.author)
     // console.log(userRes.data.Items[0])
     postUser.value = userRes.data.Items[0]
-
     if(postUser.value && postUser.value.avatar !== "abandoned")postUser.value.avatar = chageAvatarUrl(postUser.value.avatar)
-
+    //获取评论数
+    const commentRes = await postCommentsService(post.instanceID.toString(), 1)
+    // console.log(commentRes.data.totalItems)
+    commentCount.value = commentRes.data.totalItems
   } catch (e) {
     console.error('获取用户失败', e)
   }
 
   try {
-    const likeRes = await getLikesCountService(post.instanceID, 'post')
+    //是否点赞
+    // console.log(post)
+    const Res = await getUserisLikedService(post.instanceID.toString(), 'post')
+    // console.log(likeRes)
+    liked.value = Res.data
+    const likeRes = await getLikesCountService(post.instanceID.toString(), 'post')
     likeCount.value = likeRes.data.totalItems
 	// console.log(likeCount.value)
   } catch (e) {
@@ -124,32 +132,19 @@ onMounted(async () => {
 //   const starColor = computed(() => (starred.value ? ['#f5a623', '#ffffff'] : ['#9b9b9b', '#ffffff']))
   const commentColor = ref(['#9b9b9b', '#ffffff'])
   
-  // 文章类型
-//   const topicUrl = new Map<string, string>([
-// 	['#all', '/blog/all'],
-// 	['#other', '/blog/other'],
-// 	['#question', '/blog/question'],
-// 	['#technology', '/blog/technology'],
-//   ])
-//   const topicText = new Map<string, string>([
-// 	['#all', '#全部'],
-// 	['#other', '#其他闲聊'],
-// 	['#question', '#题解讨论'],
-// 	['#technology', '#技术杂谈'],
-//   ])
   
   // router
   const router = useRouter()
-  const toBlogDetailUrl = `/BlogDetail/${post.instanceID}`
-  
+  const toBlogDetailUrl = `/BlogDetail/${post.instanceID.toString()}`
+  // console.log(post.instanceID)
   // toggle like
   const toggleLike = async () => {
 	try {
 	  if (liked.value) {
-		await unlikeResourceService(post.instanceID, 'post')
+		await unlikeResourceService(post.instanceID.toString(), 'post')
 		likeCount.value--
 	  } else {
-		await likeResourceService(post.instanceID, 'post')
+		await likeResourceService(post.instanceID.toString(), 'post')
 		likeCount.value++
 	  }
 	  liked.value = !liked.value
@@ -173,15 +168,23 @@ onMounted(async () => {
 // 	  ElMessage.error('操作失败，请稍后重试')
 // 	}
 //   }
-//分享
-function copyCurrentUrl() {
+function copyCurrentUrl(postId: number) {
   const currentUrl = window.location.href;
-  navigator.clipboard.writeText(currentUrl).then(() => {
-    proxy.$message.success('链接已复制到剪贴板');
-  }).catch(err => {
-    console.error('未能复制文本: ', err);
-    proxy.$message.error('复制链接失败');
-  });
+  const url = new URL(currentUrl);
+
+  // 替换路径部分为 /blogDetail/:id
+  url.pathname = `/blogDetail/${postId}`;
+
+  const newUrl = url.toString();
+
+  navigator.clipboard.writeText(newUrl)
+    .then(() => {
+      ElMessage.success('链接已复制到剪贴板');
+    })
+    .catch(err => {
+      console.error('未能复制文本: ', err);
+      ElMessage.error('复制链接失败');
+    });
 }
   // 计算时间差
   const calculateTime = () => {
@@ -197,7 +200,7 @@ function copyCurrentUrl() {
 	if (diff < w) return `${Math.floor(diff / d)} 天前`
 	return post.createdAt
   }
-  </script>
+</script>
   
 <style scoped lang="scss">
 .blog-card {
