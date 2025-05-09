@@ -1,26 +1,14 @@
 <template>
-    <el-container>
+    <el-container style="min-height: 110vh;">
         <el-aside width="20%">
-
-
-            <el-card shadow="always" v-if="!loadBlogDone"
-                style="margin-left: 5%;position: fixed; top: 140px; left: 0px;  width: 15%; z-index: 1040;">
-                <el-skeleton animated />
-                <br />
-                <el-skeleton style="--el-skeleton-circle-size: 100px" animated>
-                    <template #template>
-                        <el-skeleton-item variant="circle" animated />
-                    </template>
-                </el-skeleton>
-            </el-card>
         </el-aside>
-        <el-container style="min-height: 105vh;">
+        <el-container style="min-height: 105vh;" >
             <el-header style="max-height: 10px;">
 
             </el-header>
-            <el-main>
-
-                <!-- 帖子主体 -->
+            <el-main  style="height: 100%;">
+            <div ref="scrollContainer" v-infinite-scroll="" infinite-scroll-distance="100" class="blog-content" style="height: 90vh; overflow: auto;">
+                <!-- 帖子主体 --> 
                 <el-card shadow="always">
                     <!-- 面包屑导航栏 -->
                     <el-breadcrumb separator="/">
@@ -29,7 +17,7 @@
                     </el-breadcrumb>
                     <el-divider />
 
-                    <!-- 加载动态 -->
+                    <!-- 加载动态,骨架 -->
                     <el-skeleton style="width: 100%" v-if="!loadBlogDone">
                         <template #template>
                             <el-skeleton-item variant="image" style="width: 100%; height: 20%" />
@@ -43,38 +31,27 @@
 
                         </template>
                     </el-skeleton>
-
+                   
                     <!-- 加载完成主体 -->
-                    <div v-if="loadBlogDone">
+                    <div v-if="loadBlogDone"  >
+                    
+                    
                         <!-- 帖子信息头部 -->
-                        <div style="height: 14em;">
-
-                            <div style="background-image: linear-gradient(180deg,transparent,rgba(0,0,0,.7));"></div>
-
-                            <!-- <img :src="blog?.faceImage" class="absolute left-0 top-0 w-full h-full z-0 object-cover" /> -->
-                            <!-- 关注按钮 -->
+                        <div>
+                            <!-- 背景渐变 -->
+                            <div ></div>
+                            <!-- 标题 -->
+                            <h2 >{{ blog?.title }}</h2>
+                            <!-- 关注按钮和标题、头像 -->
+                            <!-- 头像和用户名 -->
                             <div >
-                                <a href="#" @click="subscribeChoice" 
-                                    :class="subscribeClass">{{ subscribeValue }}</a>
-                                <h2 >
-                                    <!-- 标题 -->
-
-                                    {{ blog?.title }}
-                                    <!-- 管理员标签 -->
-                                    <!-- <el-tag v-for="admintag in blog?.adminTags" :type="admintag.type" class="mx-1"
-                                        effect="dark">{{ admintag.message }}</el-tag> -->
-                                </h2>
-                                <div >
-                                    <!-- 头像 -->
-                              
-                                    <el-avatar :src="author?.avatar"  />
-                                    <div>
-                                        <p >{{ author?.nickname }} </p>
-                                        <p >{{  calculateTime() }}</p>
-                                    </div>
-                                </div>
+                                <Author
+                                v-if="author"
+                                :user="author"
+                                default-avatar="/images/default-avatar.png"/>
                             </div>
-
+                            <!-- 发布时间 -->
+                            <p class="post-time">{{ calculateTime() }}</p>
                         </div>
                         <el-divider />
                         <!-- 帖子内容 -->
@@ -97,7 +74,8 @@
                             </div>
                             <!-- 回复评论 -->
                             <div class="action-item" @click="openCommentsEdit">
-                                <comment theme="outline" size="24" :fill="shareColor" />
+                                <comment theme="outline" size="24" :fill="shareColor"  />
+                                <span class="action-text">{{ commentCount }}</span>
                             </div>
                             <!-- 分享 -->
                             <div
@@ -126,7 +104,7 @@
 
                             <!-- 删除 -->
                             <div
-                                v-show="useUserInfoStore().userinfo.username === blog?.author"
+                                v-show="useUserInfoStore().userinfo.username === blog?.author || useUserInfoStore().isAdmin"
                                 class="action-item"
                                 @click="removeBlog"
                                 @mouseleave="deleteColor = ['#9b9b9b', '#ffffff']"
@@ -137,48 +115,20 @@
                             </div>
                         </div>
                     </div>
-
+                    <!-- 评论卡片 -->
+                    <commentsCard v-for="comments in commentsList" :key="comments.ID" :comments="comments" :bid="postId" />
+                     <!-- 如果要显示“没有评论”提示 -->
+                    <div v-if="commentCount === 0" class="empty">
+                    暂无评论，快来抢沙发~
+                    </div>
+                    <el-divider >没有更多评论啦~</el-divider>
                 </el-card>
-                <!-- 评论卡片 -->
-                <!-- <commentsCard v-for="comments in commentsList" :comments="comments" :bid="blog?.id" /> -->
+            </div>
             </el-main>
             <el-footer>
             </el-footer>
         </el-container>
         <el-aside width="20%">
-
-            <el-card shadow="always" v-if="!loadBlogDone"
-                style="margin-right: 5%;position: fixed; top: 140px; right: 0px;  width: 15%; z-index: 1040;">
-                <div>
-                    <el-skeleton :rows="3" animated />
-                </div>
-                <el-divider />
-                <div style="margin-top: 10px;">
-                    <span style="color: gray;">相关标签</span> <br /><br />
-                    <el-skeleton :rows="1" animated />
-                </div>
-            </el-card>
-
-            <!-- 侧边栏 -->
-            <el-card shadow="always" v-if="loadBlogDone"
-                style="margin-right: 5%;position: fixed; top: 140px; right: 0px;  width: 15%; z-index: 1040;">
-                <div style="margin-top: 10px;">
-                    <span style="color: gray;">评论次数</span>
-                    <!-- <el-tag class="ml-2" type="info" style="float: right;">{{ blog?.comment }}</el-tag> -->
-                </div>
-                <div style="margin-top: 10px;">
-                    <span style="color: gray;">点赞次数</span>
-                    <!-- <el-tag class="ml-2" type="info" style="float: right;">{{ blog?.like }}</el-tag> -->
-                </div>
-                <el-divider />
-                <div style="margin-top: 10px;">
-                    <span style="color: gray;">相关标签</span> <br /><br />
-                    <!-- 管理员标签 -->
-                    <!-- <el-tag v-for="admintag in blog?.adminTags" :type="admintag.type" class="mx-1" effect="dark">{{
-                        admintag.message }}</el-tag> -->
-                    <el-tag class="mx-1" type="info" v-for="tag in tags" round>{{ tag }}</el-tag>
-                </div>
-            </el-card>
         </el-aside>
     </el-container>
 
@@ -196,19 +146,19 @@
         </button>
     </el-drawer>
     <!-- 修改弹出框 -->
-    <!-- <el-drawer v-model="editChangeOpen" title="I am the title" :with-header="false" direction="btt" size="80%">
-        <MarkdownRenderer type="change" :blog="blog" />
-    </el-drawer> -->
+    <el-drawer v-model="editChangeOpen" title="I am the title" :with-header="false" direction="btt" size="80%">
+        <MarkdownEditor type="change" :blog="blog" />
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
 import { Like,Comment,Share,Delete,Edit} from '@icon-park/vue-next'
 import { ElMessage } from 'element-plus'
 
-import { getPostByIdService, queryPostsService } from '@/api/post'
+import { getPostByIdService, queryPostsService,deletePostService,uploadImageService } from '@/api/post'
 import { SearchUserService,chageAvatarUrl } from '@/api/user'
 import { likeResourceService, unlikeResourceService,getLikesCountService,getUserisLikedService } from '@/api/like'
-  import { createCommentService, postCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
+import { createCommentService, getCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
 
 import { reactive, ref,computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
@@ -216,30 +166,34 @@ import type { Post, comment, userInfo } from '@/lib/types'
 import useClipboard from "vue-clipboard3";
 import { useUserInfoStore } from '@/stores/userInfo'
 import commentsCard from './commentsCard.vue'
-import { subscribeUser,unsubscribeUser } from '@/api/subscribe'
-import { fa } from 'element-plus/es/locales.mjs';
-// import MarkdownRenderer from '@/components/front/MarkdownRenderer.vue'
+import Author from './author.vue'
+
+import MarkdownEditor from './MarkdownEditor.vue'
 
 const { toClipboard } = useClipboard();
 const {params} = useRoute()
 const router = useRouter()
-const blog = ref<Post | null>(null)
-const markdown = ref("") // markdown内容
+const scrollContainer  = ref(null)
+const blog = ref<Post | null>(null) // 帖子信息
+const markdown = ref("") // 文章内容
 const author = ref<null | userInfo>(null) // 用户
-const type = ref("#all") // 搜索类型
+// const type = ref("#all") // 搜索类型
 const loadBlogDone = ref(false) // 是否加载完成
 const openEditer = ref(false) //是否弹出评论编辑器
 const editChangeOpen = ref(false) // 编辑器 弹出框
+
 const commentsList = ref<any>([])
+// 响应式数组：存储上传后的图片链接
+const imgUrlList = ref<string[]>([])
+const commentCount = ref(0)
+
 const shareColor = ref(['#9b9b9b', '#ffffff'])
-const postId = params.id
+const postId = params.id // 帖子id
 
 // 关注状态
 const subscribeValue = ref("关注")
 const subscribeState = ref(false)
-const subscribeClass = ref("px-4 py-1 bg-black text-gray-200 inline-flex items-center justify-center mb-2 hover:bg-gray-500")
-const subscribedClass = ref("px-4 py-1 bg-black text-gray-600 inline-flex items-center justify-center mb-2 hover:bg-gray-200")
-const unSubscribeClass = ref("px-4 py-1 bg-black text-gray-200 inline-flex items-center justify-center mb-2 hover:bg-gray-500")
+
 
 // 喜欢状态
 const likeState = ref(false)
@@ -247,10 +201,6 @@ const likeCount = ref(0)
 const likeMouseEnter = ref(['#67C23A', '#ffffff']) // 鼠标移入
 const likeMouseLeave = ref(['#9b9b9b', '#ffffff']) // 鼠标移出
 
-// // 收藏状态
-const starMouseEnter = ref(['#f5a623', '#ffffff'])
-const starMouseLeave = ref(['#9b9b9b', '#ffffff'])
-const starColor = ref(['#9b9b9b', '#ffffff'])
 
 // 删除状态
 const deleteColor = ref(['#9b9b9b', '#ffffff'])
@@ -258,62 +208,21 @@ const deleteColor = ref(['#9b9b9b', '#ffffff'])
 // 编辑状态
 const editColor = ref(['#9b9b9b', '#ffffff'])
 
-let comments = reactive<comment>({
-    ID: 0,
-    // bid: "000",
-    refer_type: "", //引用的类型
-    instanceID: 0, // 评论的实例ID
-    createdAt: "",
+let comments = reactive<comment>({    
     content: "",
     author: "",
-    refer_id: 0,//引用的评论，可选
-    source_id: 0,//源ID，例如帖子ID
-    source_type: "",//源类型，例如 "post"
-    updatedAt: "",
+    refer_type: "", //引用的类型
+    refer_id: 0n,//引用的评论，可选
+    source_id: 0n,//源ID，例如帖子ID
+    source_type: ""//源类型，例如 "post"
 })
-const subscribeChoice = () => {//关注
-    if(subscribeState.value){
-        unSubscribe()
-    }else{
-        subscribe()
-    }
-}
-
-const unSubscribe =async () => {// 取消关注
-    if (useUserInfoStore().$state.isLogin) {
-        const res =await unsubscribeUser(blog.value?.author)
-            ElMessage({
-                message: res.data.message,
-                type: 'success'
-            })
-            location.reload()
-
-    }else{
-        ElMessage.error("请先登录！")
-    }
-
-}
-const subscribe = () => {
-    if (useUserInfoStore().$state.isLogin) {
-        const res = subscribeUser(blog.value?.author)
-            ElMessage({
-                message: res.data.message,
-                type: 'success'
-            })
-            location.reload()
-        
-    }else{
-        ElMessage.error("请先登录！")
-    }
-
-}
 const getBlogDetial = async () => {
-    console.log(postId);
+    // console.log(postId);
     const res = await getPostByIdService(postId)
-    console.log(res.data);
+    // console.log(res.data);
     blog.value = res.data
     markdown.value = res.data.content
-    console.log(markdown.value);
+    // console.log(markdown.value);
     // blog.value!.adminTags = JSON.parse(blog.value?.adminTags)
     // if (typeof res.data.data.tag != 'object') {
     //     tags.value = JSON.parse(res.data.data.tag)
@@ -323,19 +232,19 @@ const getBlogDetial = async () => {
     if(subscribeState.value == true){
         subscribeValue.value = "已关注"
         subscribeState.value = true
-        subscribeClass.value = subscribedClass.value
     }
     getCommentsList()
     getUser()
     getLikesCount()
 }
 getBlogDetial()
+
 const getUser =async () =>{
-    console.log(blog);
-  const res =await SearchUserService(blog !==null ? blog.value.author:'')
-  console.log(res.data);
+    // console.log(blog);
+  const res =await SearchUserService(blog !==null ? blog?.value.author:'')
+//   console.log(res.data);
   author.value = res.data.Items[0]
-  console.log(author.value );
+//   console.log(author.value );
   if(author.value !== null)author.value.avatar = chageAvatarUrl(author.value.avatar)
 }
 const getLikesCount = async () => {
@@ -345,60 +254,28 @@ const getLikesCount = async () => {
         //是否点赞
     // console.log(post)
     const Res = await getUserisLikedService(postId, 'post')
-    console.log(Res)
+    // console.log(Res)
     likeState.value = Res.data
     // 初始化喜欢状态
     if (likeState.value === false) {
     let likeTempColor = likeMouseEnter.value
     likeMouseEnter.value = likeMouseLeave.value
     likeMouseLeave.value = likeTempColor
-    likeColor.value = ['#f56c6c', '#ffffff']
     }
     const likeRes = await getLikesCountService(postId, 'post')
     likeCount.value = likeRes.data.totalItems
 }
-/**
- * markdown中插入图片
- * @param event 
- * @param insertImage 
- * @param files 
- */
-const handleUploadImage = (event: any, insertImage: any, files: File[]) => {
-    // let formData: any = new FormData()
-    // formData.append('file', files[0])
-    // console.log(files[0]);
 
-
-    // API({
-    //     url: '/uploadImg',
-    //     data: formData,
-    //     method: 'post',
-    //     headers: { 'Content-Type': 'multipart/form-data' }
-    // }).then((res) => {
-    //     console.log(res);
-    //     insertImage({
-    //         url: res.data
-    //     })
-    // })
-
-}
 
 
 const removeBlog = () => {
-    // API({
-    //     url: '/removeBlog/' + blog.value?.id,
-    //     method: 'get'
-    // }).then((res) => {
-    //     if (res.data.state == 40001) {
-    //         ElMessage({
-    //             message: res.data.message,
-    //             type: 'success'
-    //         })
-    //         router.push('/blog/all')
-    //     } else {
-    //         ElMessage.error(res.data.message)
-    //     }
-    // })
+    const res = confirm("确定删除吗？")
+    if (res) {
+        deletePostService(postId).then(() => {
+            ElMessage.success("删除成功")
+            router.push('/')
+        })
+    }
 }
 // 打开回复评论窗口
 const openCommentsEdit = () => {
@@ -409,22 +286,16 @@ const openCommentsEdit = () => {
         openEditer.value = true
     }
 }
+
 // 得到评论列表
-const getCommentsList = () => {
-    // let getCommentsUrl = useUserInfoStore().$state.isLogin ?
-    //     '/getCommentsList/' + blog.value?.id + "/" + useUserInfoStore().$state.user.id :
-    //     '/getCommentsList/' + blog.value?.id + "/0"
-    // API({
-    //     url: getCommentsUrl,
-    //     method: 'get'
-    // }).then((res) => {
-    //     console.log("commentsList", res.data);
-    //     commentsList.value = res.data.data
-        loadBlogDone.value = true
-    // }).catch(err => {
-    //     ElMessage.error("服务器除了一点小问题,稍后再试~")
-    // })
+const getCommentsList =async () => {
+    const res = await getCommentsService(postId)
+    commentCount.value = res.data.totalItems
+    commentsList.value = res.data.items
+    console.log(commentsList.value);
+    loadBlogDone.value = true
 }
+
 // 赞
 const toggleLike = async () => {
 	try {
@@ -444,29 +315,38 @@ const toggleLike = async () => {
   // 点赞颜色
   let likeColor = computed(() => (likeState.value ? ['#f56c6c', '#ffffff'] : ['#9b9b9b', '#ffffff']))
 // 发送评论
-const sendComments = () => {
-    // comments.bid = blog.value!.id
-    // comments.blogUid = blog.value!.user.id
-    // comments.commentsUid = useUserInfoStore().$state.user.id
-    // comments.commentsContext = markdown.value
-    // API({
-    //     url: '/addComments',
-    //     method: 'post',
-    //     data: comments
-    // }).then((res) => {
-    //     ElMessage({
-    //         message: '回复成功.',
-    //         type: 'success',
-    //     })
-    //     location.reload()
-    //     openEditer.value = !openEditer.value
-    // }).catch(err => {
-    //     ElMessage.error("服务器除了一点小问题,稍后再试~")
-    // })
+const sendComments =async () => {
+    // 评论对象
+    comments.refer_type = "post"
+    comments.refer_id = BigInt(postId)
+    //  源ID
+    comments.source_id = BigInt(postId)
+    comments.source_type = "post"
+    comments.author = useUserInfoStore().userinfo.username
+    const res =await createCommentService(comments)
+    console.log(res);
+    ElMessage({
+        message: '回复成功.',
+        type: 'success',
+    })
+    location.reload()
+    openEditer.value = !openEditer.value
+
 }
-
-let tags = ref([])
-
+//插入图片
+const handleUploadImage = async (event: any, insertImage: any, files: File[]) => {
+    let formData: any = new FormData()
+    formData.append('file', files[0])
+    console.log(files[0]);
+    const res =await uploadImageService(formData)
+    ElMessage({
+        message: res.data.sub_type,
+        type: 'success'
+    })
+    let URL  = chageAvatarUrl(res.data.sub_url)
+    imgUrlList.value.push(URL)
+    console.log(imgUrlList.value);
+}
 
 
 
@@ -509,6 +389,14 @@ return blog.value?.createdAt
 </script>
 
 <style scoped>
+/* 滑动栏 */
+.blog-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+/* 顶部 */
+
+/* 操作栏样式 */
 .action-bar {
   display: flex;
   justify-content: space-between;

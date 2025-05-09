@@ -74,16 +74,17 @@ export interface Post {
 }
 
 export interface comment {
-    ID: number; // 评论的唯一标识符
-    instanceID: number; // 实例ID
-    createdAt: string; // 创建时间
-    updatedAt: string; // 更新时间
+    ID?: number; // 评论的唯一标识符
+    instanceID?: number; // 实例ID
+    createdAt?: string; // 创建时间
+    updatedAt?: string; // 更新时间
     DeletedAt?: string | null; // 删除时间（如果适用）
     content: string; // 评论内容
     author: string; // 评论作者
-    refer_id?: number; // 引用的评论ID（可选）
+
+    refer_id?: bigint;
     refer_type?: string; // 引用的评论类型（可选）
-    source_id: number; // 源ID（例如帖子ID）
+    source_id: BigInt; // 源ID（例如帖子ID）
     source_type: string; // 源类型（例如 "post"）
 }
 // export interface PostList {//总文章列表
@@ -96,7 +97,7 @@ export interface like {//点赞
     createdAt: string; // 创建时间
     updatedAt: string; // 更新时间
     DeletedAt?: string | null; // 删除时间（如果适用）
-    item_id: number; // 被点赞项目的ID
+    item_id: bigint; // 被点赞项目的ID
     item_type: string; // 被点赞项目的类型，如 "post" 或 "comment"
 }
 

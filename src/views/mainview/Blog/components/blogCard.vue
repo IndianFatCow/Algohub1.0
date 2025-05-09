@@ -11,9 +11,15 @@
 		  {{ post.title }}
 		</RouterLink>
 		<div class="blog-card__author">
-			<!-- <img src="@/assets/sunrise.jpg" class="blog-card__avatar" /> -->
-      <img :src="(postUser?.avatar !== 'abandoned' && postUser != null) ? postUser.avatar : defaultAvatar" class="blog-card__avatar" />
-			<span>{{ postUser != null ? postUser.nickname : '默认昵称' }}</span>
+      <!-- <img :src="(postUser?.avatar !== 'abandoned' && postUser != null) ? postUser.avatar : defaultAvatar" class="blog-card__avatar" />
+			<span>{{ postUser != null ? postUser.nickname : '默认昵称' }}</span> -->
+      <Author
+        v-if="postUser"
+        :user="postUser"
+        default-avatar="/images/default-avatar.png"
+        @follow="handleFollow"
+        @message="handleMessage"
+      />
 		</div>
 			<div class="blog-card__time">
 				<ClockCircleOutlined />
@@ -70,11 +76,12 @@
   // import { useUserInfoStore } from '@/stores/userInfo'
   import { likeResourceService, unlikeResourceService,getLikesCountService,getUserisLikedService } from '@/api/like'
   // import { getPostByIdService, queryPostsService } from '@/api/post'
-  import { createCommentService, postCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
+  import { createCommentService, getCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
   import { SearchUserService,chageAvatarUrl } from '@/api/user'
   import { usePostStore} from '@/stores/postStore'
   
   import defaultAvatar from '@/assets/algo_logo.webp'
+  import Author from './author.vue'
   import { ElMessage } from 'element-plus'
   import type { userInfo, Post, like, comment } from '@/lib/types'
   import { getCurrentInstance } from 'vue';
@@ -105,9 +112,10 @@ onMounted(async () => {
     const userRes = await SearchUserService(post.author)
     // console.log(userRes.data.Items[0])
     postUser.value = userRes.data.Items[0]
+    console.log(postUser.value)
     if(postUser.value && postUser.value.avatar !== "abandoned")postUser.value.avatar = chageAvatarUrl(postUser.value.avatar)
     //获取评论数
-    const commentRes = await postCommentsService(post.instanceID.toString(), 1)
+    const commentRes = await getCommentsService(post.instanceID.toString(), 1)
     // console.log(commentRes.data.totalItems)
     commentCount.value = commentRes.data.totalItems
   } catch (e) {
@@ -152,22 +160,14 @@ onMounted(async () => {
 	  ElMessage.error('操作失败，请稍后重试')
 	}
   }
-//收藏
-  // toggle star (subscribe)
-//   const toggleStar = async () => {
-// 	try {
-// 	  if (starred.value) {
-// 		await unlikePost(blog.id, 'post')
-// 		starCount.value--
-// 	  } else {
-// 		await likePost(blog.id, 'post')
-// 		starCount.value++
-// 	  }
-// 	  starred.value = !starred.value
-// 	} catch (err) {
-// 	  ElMessage.error('操作失败，请稍后重试')
-// 	}
-//   }
+  function handleFollow(username: string) {
+  // 调用关注接口……
+  
+}
+
+function handleMessage(username: string) {
+  // 打开私信窗口……
+}
 function copyCurrentUrl(postId: number) {
   const currentUrl = window.location.href;
   const url = new URL(currentUrl);

@@ -1,15 +1,18 @@
 <template>
   <el-container>
     <el-aside width="20%">
+      
+      <el-button @click="" type="primary" :icon="Plus" class="right-aligned-btn"  >发布文章</el-button>
 
+      <el-button @click="refreshPage" :icon="Refresh" class="right-aligned-btn"  >刷新</el-button>
     </el-aside>
-    <el-container style="min-height: 105vh;">
+    <el-container style="min-height: 100vh;">
       <el-header style="max-height: 10px;" >
       </el-header>
       <el-main>
 
         <el-card shadow="always" style="height: 100%" >
-        <div class="scrollable-content" style="height: 100vh; overflow: auto;"
+        <div class="scrollable-content" style="height: 80vh; overflow: auto;"
           v-loading="blogListLoading"
           v-infinite-scroll="loadMore"
           :infinite-scroll-container="scrollContainer"
@@ -30,6 +33,7 @@
             <!-- <blogCard v-for="item in postStore.posts" :post="item" :key="item.instanceID" /> -->
             <!-- <el-divider></el-divider> -->
           </div>
+          <el-divider>没有更多内容了</el-divider>
             <!-- 返回顶部按钮 -->
             <el-backtop
             target=".scrollable-content"
@@ -58,7 +62,6 @@
       </el-main>
       <el-footer>
 
-
       </el-footer>
     </el-container>
     <el-aside width="20%"></el-aside>
@@ -68,13 +71,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { TabsPaneContext,ElAffix } from 'element-plus'
+import { Plus, Search } from '@element-plus/icons-vue'
+import { Refresh } from '@icon-park/vue-next'
 import blogCard from './components/blogCard.vue'
 // import BlogHeader from './components/BlogHeader.vue'
  import { getPostByIdService, queryPostsService } from '@/api/post'
 // import { queryCommentsService } from '@/api/comment'
 // import { useUserInfoStore } from '@/stores/userInfo'
 import { useRoute } from 'vue-router';
-import { Search } from '@element-plus/icons-vue'
+
 
 // import show from '../compoment/show.vue'
 import { usePostStore } from '@/stores/postStore'
@@ -93,6 +98,10 @@ const pageSize = ref(5) //每页显示的数量
 const userPage = ref(1) //当前页码
 const totalSize = ref(0) //总数据量
 const noMore = ref(false) //是否还有更多数据
+const refreshPage = () => {
+  window.location.reload();
+};
+
 const loadMore = async () => {
   console.log('加载更多数据...')
   if (blogListLoading.value || noMore.value) return
@@ -150,6 +159,13 @@ const handleClick = (tab: TabsPaneContext, event: Event) => { //选项卡点击�
 }
 </script>
 <style>
+/* 左侧按钮 */
+.right-aligned-btn {
+  display: block;
+  margin: 10px 0;
+  float: right;
+  padding: auto;
+}
 .scrollable-content {
   max-height: 100vh; 
   overflow-y: auto;

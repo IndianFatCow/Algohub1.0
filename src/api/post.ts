@@ -41,3 +41,7 @@ export const updatePostService = (id:number, postData:any) => {
 export const deletePostService = (id:number) => {
     return request.delete(`/post/${id}`);
 };
+//上传图片
+export const uploadImageService = (file:any,postId?:number) => {
+    return request.post(`/post/${{}}/image`, file);
+};

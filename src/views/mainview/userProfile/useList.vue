@@ -52,7 +52,7 @@
   const currentUsername = 'your-username'; // 从store或props中获取当前登录用户
   
   onMounted(async () => {
-    const res = await getSubscribeList(currentUsername, 'user');
+    const res = await getSubscribeList(currentUsername);
     users.value = res.data.map((u: any) => ({
       ...u,
       subscribed: true,

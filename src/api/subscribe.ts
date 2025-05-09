@@ -11,7 +11,7 @@ export const unsubscribeUser = (username?: string) => {
 }
 //获取订阅列表
 export const getSubscribeList = (username: string, resource_type: string,offset?:number,limit?:number) => {
-    return request.get(`/user/${username}/${resource_type}/subscribe`,{params:{offset,limit}})
+    return request.get(`/user/${username}/subscribe`,{params:{offset,limit}})
 }
 //获取订阅数目
 export const getSubscribeCount = (username: string) => {

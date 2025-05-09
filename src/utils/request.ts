@@ -18,6 +18,11 @@ const instance = axios.create({
     (data) => {
       return JSONBig.parse(data); // 自动将大整数转为字符串
     }
+  ],
+    transformRequest: [
+    (data) => {
+        return JSONBig({ useNativeBigInt: true }).stringify(data); // 自动将大整数转为字符串
+    }
   ]
   });
 //导入router

@@ -105,8 +105,10 @@ export const SearchUserService = (username:string, offset?:number,limit?:number)
 export const  chageAvatarUrl = (avatar:string)=> {
     // 获取新的和旧的URL头
     const oldPrefix = 'http://minio:9000';
-    // const newPrefix = 'http://127.0.0.1:9000';
-    const newPrefix = 'http://192.168.1.166:9000';
+    // const newPrefix = 'http://127.0.0.1:9000';//本地
+    // const newPrefix = 'http://192.168.1.166:9000';//局域网
+    const newPrefix = 'http://114.55.235.23:9000';//云服务器
+    
 
     // 检查当前URL是否以旧的前缀开头
     if (avatar.startsWith(oldPrefix)) {

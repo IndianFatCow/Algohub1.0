@@ -6,11 +6,11 @@ import request from '@/utils/request.js';
  *  包含内容(content)、作者(author)、引用ID(refer_id)、引用类型(refer_type)、来源ID(source_id)和来源类型(source_type)等信息的对象
  */
 export const createCommentService = (commentData: any) => {
-    return request.post('/comment', commentData);
+    return request.post(`/post/${commentData.source_id}/comment`, commentData);
 };
 
 // 查询评论列表
-export const postCommentsService = (post_Id?:string,limit = 10, offset = 0) => {
+export const getCommentsService = (post_Id?:string,limit = 10, offset = 0) => {
     // 构建请求参数对象
     const params = {
         limit,

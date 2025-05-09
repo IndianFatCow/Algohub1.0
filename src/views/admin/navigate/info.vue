@@ -22,7 +22,7 @@ onMounted(() => {
       <p><strong>昵称:</strong> {{ userInfo.userinfo.nickname }}</p>
       <p><strong>是否登录:</strong> {{ userInfo.isLogin }}</p>
       <p><strong>身份:</strong> {{ userInfo.isAdmin ? '管理员' : '普通用户' }}</p>
-      <p><strong>头像:</strong></p>
+      <p><strong>头像:</strong> {{  userInfo.userinfo.avatar }}</p>
       <img :src="userInfo.userinfo.avatar" alt="头像" class="avatar-image">
     </div>
 

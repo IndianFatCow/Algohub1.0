@@ -156,7 +156,7 @@ import miniCenter from './userCenter/miniCenter.vue';
 
 .main-content {
   flex: 1 1auto;
-  overflow: hidden !important; /* 强制去掉滚动条 */
+  /* overflow: hidden !important; 强制去掉滚动条 */
   padding: 0;
   height: 100%;
   /* background-image: url('@/assets/frosty-night.jpg');
@@ -171,7 +171,7 @@ import miniCenter from './userCenter/miniCenter.vue';
 /* 新增：全局样式覆盖 el-main */
 :deep(.el-main) {
   /* height: calc(100vh - 60px); 减去 header 的高度（假设 header 高度为 60px） */
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }
