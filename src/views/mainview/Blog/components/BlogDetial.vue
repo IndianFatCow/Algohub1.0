@@ -6,14 +6,14 @@
             <el-header style="max-height: 10px;">
 
             </el-header>
-            <el-main  style="height: 100%;">
             <div ref="scrollContainer" v-infinite-scroll="" infinite-scroll-distance="100" class="blog-content" style="height: 90vh; overflow: auto;">
+            <el-main  style="height: 100%;">
+            
                 <!-- 帖子主体 --> 
                 <el-card shadow="always">
                     <!-- 面包屑导航栏 -->
                     <el-breadcrumb separator="/">
-                        <!-- <el-breadcrumb-item :to="{ path: '/blog/all' }">讨论</el-breadcrumb-item> -->
-                        <el-breadcrumb-item><a href="#">{{ blog?.title }}</a></el-breadcrumb-item>
+                        <router-link to="/">Algohub/{{ blog?.title }}</router-link>       
                     </el-breadcrumb>
                     <el-divider />
 
@@ -38,8 +38,6 @@
                     
                         <!-- 帖子信息头部 -->
                         <div>
-                            <!-- 背景渐变 -->
-                            <div ></div>
                             <!-- 标题 -->
                             <h2 >{{ blog?.title }}</h2>
                             <!-- 关注按钮和标题、头像 -->
@@ -114,19 +112,21 @@
                             </div>
                             </div>
                         </div>
+                    
                     </div>
-                    <!-- 评论卡片 -->
-                    <commentsCard v-for="comments in commentsList" :key="comments.ID" :comments="comments" :bid="postId" />
-                     <!-- 如果要显示“没有评论”提示 -->
-                    <div v-if="commentCount === 0" class="empty">
-                    暂无评论，快来抢沙发~
-                    </div>
-                    <el-divider >没有更多评论啦~</el-divider>
                 </el-card>
-            </div>
+           
             </el-main>
-            <el-footer>
+            <el-footer >                    
+                <!-- 评论卡片 -->
+                <commentsCard v-for="comments in commentsList" :key="comments.ID" :comments="comments" :bid="postId" />
+                    <!-- 如果要显示“没有评论”提示 -->
+                <div v-if="commentCount === 0" class="empty">
+                暂无评论，快来抢沙发~
+                </div>
+                <el-divider >没有更多评论啦~</el-divider>
             </el-footer>
+        </div>
         </el-container>
         <el-aside width="20%">
         </el-aside>
@@ -291,7 +291,8 @@ const openCommentsEdit = () => {
 const getCommentsList =async () => {
     const res = await getCommentsService(postId)
     commentCount.value = res.data.totalItems
-    commentsList.value = res.data.items
+    //  过滤掉评论的评论
+    commentsList.value =  res.data.items.filter(item => item.refer_type !== 'comment');
     console.log(commentsList.value);
     loadBlogDone.value = true
 }

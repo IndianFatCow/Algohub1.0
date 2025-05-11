@@ -22,7 +22,7 @@
           :infinite-scroll-disabled="noMore"
           :infinite-scroll-distance="100"
         >
-          <Header   :articleCount="articleCount"></Header>
+          <Header :articleCount="articleCount" :user="user" :isUser="isUser" :followingCount="followingCount"></Header>
           <!-- 顶部导航栏 -->
           <el-tabs v-model="activeTab" class="tab-container" @tab-change="handleTabChange">
             <el-tab-pane label="动态" name="dynamic"> </el-tab-pane>
@@ -71,7 +71,7 @@
 
       <!-- 关注列表内容区域 -->
       <div v-if="activeTab === 'following'">
-        
+        <userList :users="followList"  />
         <el-divider></el-divider>
       </div>
 
@@ -113,13 +113,15 @@
     </el-container>
   </template>
   
-  <script lang="ts" setup>
+<script lang="ts" setup>
   import { ref,onMounted } from 'vue'
   import { ElAffix,ElMessage} from 'element-plus'
 
   // import BlogHeader from './components/BlogHeader.vue'
   import { getPostByIdService, queryPostsService } from '@/api/post'
   import { getUserLikesService } from '@/api/like'
+  import { userInfoUpdateService, userInfoService,chageAvatarUrl } from '@/api/user';
+  import { getSubscribeList} from '@/api/subscribe'
   // import { queryCommentsService } from '@/api/comment'
   // import { useUserInfoStore } from '@/stores/userInfo'
   import { useRoute } from 'vue-router';
@@ -127,8 +129,9 @@
   import blogCard from '../Blog/components/blogCard.vue'
   import Header from './profileHeader.vue'
   import { useUserInfoStore } from '@/stores/userInfo'
+  import type { userInfo } from '@/lib/types';
   // import { usePostStore } from '@/stores/postStore'
-
+import userList from './userList.vue'
   interface UserLikeResponse {
   totalItems: number;
   items: Array<{
@@ -142,18 +145,55 @@
     item_id: number;
   }>;
 }
-
+  const route = useRoute()
   const userStore = useUserInfoStore()
-
-
+  const isUser = ref(false)//是不是个人主页
+  const username = route.params.username //主页主人
+  const user = ref<userInfo>()
+//初始化确认是否是个人主页
+onMounted(async () => { 
+  handleTabChange(activeTab.value)
+  if (username === userStore.userinfo.username) {
+    isUser.value = true
+    user.value = userStore.userinfo
+    const ip_address = ref({
+    ip_address: ''
+  })
+  fetch('http://ip-api.com/json/')
+  .then(response => response.json())
+  .then(data => {
+    // console.log('IP 属地信息:', data);
+    ip_address.value.ip_address = ( data.country === 'China') ? data.regionName : data.country
+    // console.log(ip_address.value)
+    const res = userInfoUpdateService(useUserInfoStore().userinfo.username,ip_address.value)
+    // console.log(res)
+    useUserInfoStore().setIP(ip_address.value.ip_address)
+    // console.log(useUserInfoStore().userinfo)
+  })
+  .catch(error => console.error('获取 IP 属地失败:', error));
+  } else {
+    try {
+      const res = await userInfoService(username)
+      user.value = res.data
+      user.value.avatar = chageAvatarUrl(user.value.avatar)
+      console.log('他人信息:', res.data)
+    } catch (err) {
+      console.error('获取用户信息失败:', err)
+    }
+  }
+})
   const scrollContainer = ref(null)//滚动容器
   const { params } = useRoute()
   const searchContent = ref('')
   const blogListLoading = ref(false)
 
+  const articleCount = ref(0) //用户文章数量
+  const followingCount = ref(0) //关注人数
+  const followersCount = ref(0) //粉丝人数
+
   const blogList = ref<any>([]) //  博客列表
   const likedPosts = ref<any>([]) //点赞的文章列表
-  const articleCount = ref(0) //用户文章数量
+
   const activeTab = ref('dynamic') //当前激活的选项卡
   
   const pageSize = ref(5) //每页显示的数量
@@ -171,7 +211,7 @@ const loadMore = async () => {
     const res = await queryPostsService(
       pageSize.value,
       offset,
-      userStore.userinfo.username
+      username 
     )
     const items = res.data.items || []
     blogList.value.push(...items)
@@ -186,7 +226,7 @@ const loadMore = async () => {
       message: '获取点赞列表',
       type: 'success',
     })
-    const res = (await getUserLikesService(userStore.userinfo.username,pageSize.value,offset))as { data: UserLikeResponse }
+    const res = (await getUserLikesService(username,pageSize.value,offset))as { data: UserLikeResponse }
     // console.log('获取点赞列表:', res.data)
     const likeItems = res.data.items || []
     totalSize.value = res.data.totalItems
@@ -216,10 +256,15 @@ const loadMore = async () => {
 
   blogListLoading.value = false
 }
-onMounted(() => {
-  // console.log('当前用户:', userStore.userinfo.username)
-  handleTabChange(activeTab.value)
-})
+const followList = ref([])
+const getFollowing = async () => {
+    const res = await getSubscribeList(username,'user')
+    followList.value = res.data.items
+    followingCount.value = res.data.totalItems
+    console.log('关注列表:', res.data)
+    console.log(followList.value)
+}
+getFollowing()
 
   const searchBlog = async () => {//搜索博客
     //实现模糊搜索，搜索标题和内容
@@ -254,7 +299,7 @@ onMounted(() => {
       // likedPosts.value = []
       loadMore()
     } else if (tab === 'following') {
-      // getFollowing()
+      getFollowing()
     } else if (tab === 'followers') {
       // getFollowers()
     }

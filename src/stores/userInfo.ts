@@ -2,24 +2,7 @@ import { defineStore } from "pinia";
 import { ref, computed, watch } from "vue";
 import type { userInfo } from "@/lib/types"; // 确保路径正确
 
-// interface userinfo {
-//     ID: number, // 修改了字段名从'id'到'ID'，类型从'string'改为'number'
-//     instanceID: number, // 新增字段
-//     createdAt: string, // 新增字段
-//     updatedAt: string, // 新增字段
-//     DeletedAt: any, // 新增字段，使用'any'类型处理可能为null的情况
-//     username: string, // 保持不变
-//     password: string, // 保持不变
-//     status: string, // 修改了字段名从'role'到'status'
-//     nickname: string, // 新增字段
-//     email: string, // 保持不变
-//     phone: string, // 新增字段
-//     avatar: string, // 修改了字段名从'url'到'avatar'，并更新描述为头像链接
-//     bio: string, // 修改了字段名从'sign'到'bio'，并更新描述为个人简介
-//     company: string, // 新增字段
-//     location: string, // 保持不变，但注意实际用途可能是显示用户的地理位置
-//     profile_url: string, // 新增字段，用于外部个人资料页面链接
-// }
+
 
 interface UserStateUpdate {
     isLogin: boolean;
@@ -45,6 +28,7 @@ export const useUserInfoStore = defineStore("userinfo", {
             company: "",
             location: "",
             profile_url: "",
+            ip_address: ""
         },
         isLogin: false,
         isAdmin: false
@@ -52,6 +36,9 @@ export const useUserInfoStore = defineStore("userinfo", {
     actions: {
         setUserInfo(newUserInfo: userInfo) {
             this.userinfo = newUserInfo;
+        },
+        setIP(ip: string){
+            this.userinfo.ip_address = ip;
         },
         setState(stateUpdate: UserStateUpdate) {
             this.isLogin = stateUpdate.isLogin;
@@ -91,7 +78,8 @@ export const useUserInfoStore = defineStore("userinfo", {
                 bio: "",
                 company: "",
                 location: "",
-                profile_url: ""
+                profile_url: "",
+                ip_address: ""
             };
             this.isLogin = false;
             this.isAdmin = false;

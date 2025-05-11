@@ -4,7 +4,7 @@
     <div class="header-bg">
       <el-badge
         class="ip-badge"
-        :value="`IP 属地：${ipLocation}`"
+        :value="`IP 属地：${props.user?.ip_address || '未知地'}`"
         type="info"
       />
     </div>
@@ -12,11 +12,11 @@
     <div class="profile-main">
       <!-- 头像 + 基本信息 -->
       <div class="left">
-        <el-avatar :src="userStore.avatar"  @click="()=>{router.push('/userCenter/avatar')}" style="cursor: pointer" shape="square" class="avatar"/>
+        <el-avatar :src="props.user?.avatar "  @click="()=>{router.push('/userCenter/avatar')}" style="cursor: pointer" shape="square" class="avatar"/>
         <div class="info">
-          <h2 class="name">{{ userStore.nickname }}</h2>
-          <p class="bio">{{ userStore.bio }}</p>
-          <el-button type="primary" size="small" @click="onEditProfile" v-if="isUser">
+          <h2 class="name">{{ props.user?.nickname }}</h2>
+          <p class="bio">{{ props.user?.bio }}</p>
+          <el-button type="primary" size="small" @click="onEditProfile" v-if="props.isUser">
             编辑个人资料
           </el-button>
         </div>
@@ -27,19 +27,19 @@
         <el-statistic
           class="stat"
           title="关注"
-          :value="followingCount"
+          :value="props.followingCount"
           :precision="0"
         />
         <el-statistic
           class="stat"
           title="粉丝"
-          :value="followersCount"
+          :value="props.followersCount"
           :precision="0"
         />
         <el-statistic
           class="stat"
           title="文章"
-          :value="articleCount"
+          :value="props.articleCount"
           :precision="0"
         />
       </div>
@@ -47,42 +47,32 @@
   </el-card>
 </template>
 
-<script setup>
-import { defineProps, defineEmits,ref } from 'vue'
+<script setup lang="ts">
+import { defineProps, defineEmits,ref,onMounted } from 'vue'
 import { useUserInfoStore } from '@/stores/userInfo'
+import { userInfoUpdateService, userInfoService,chageAvatarUrl } from '@/api/user';
 import { useRouter,useRoute } from 'vue-router'
+import type { userInfo } from '@/lib/types';
 const router = useRouter()
 const route = useRoute()
-const isUser = ref(false)
+
 // 获取路由参数（动态参数）
 const username = route.params.username
 const userStore = useUserInfoStore().userinfo
-if(username === userStore.username ){
-  isUser.value = true
-}
-const props = defineProps({
-  articleCount: { type: Number, default: 78 },
+const props = withDefaults(defineProps<{
+  user: userInfo
+  isUser: boolean
+  articleCount?: number
+  followersCount: number
+  followingCount: number
+}>(), {
+  followersCount: 0,
+  followingCount: 0
 })
-  const followersCount = ref(0)
-  const followingCount = ref(0)
 
-  const ipLocation = ref('')
-// 需要做跨域处理
-// 使用 fetch 获取 IP 信息
-fetch('http://ip-api.com/json/')
-  .then(response => response.json())
-  .then(data => {
-    console.log('IP 属地信息:', data);
-    // 示例输出：{ city: "Beijing", regionName: "Beijing", country: "China", ... }
-    // alert(`您来自：${data.city}, ${data.regionName}, ${data.country}`);
-    ipLocation.value = ( data.country === 'China') ? data.regionName : data.country
-  })
-  .catch(error => console.error('获取 IP 属地失败:', error));
+  
 
-const emit = defineEmits(['edit-profile'])
 const onEditProfile = () => {
-  // emit('edit-profile')
-
   router.push('/userCenter/info')
 }
 </script>

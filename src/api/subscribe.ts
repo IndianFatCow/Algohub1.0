@@ -10,7 +10,7 @@ export const unsubscribeUser = (username?: string) => {
     return request.delete(`/subscribe/user/${username}`)
 }
 //获取订阅列表
-export const getSubscribeList = (username: string, resource_type: string,offset?:number,limit?:number) => {
+export const getSubscribeList = (username: string, resource_type: string,offset:number=0,limit:number=10) => {
     return request.get(`/user/${username}/subscribe`,{params:{offset,limit}})
 }
 //获取订阅数目

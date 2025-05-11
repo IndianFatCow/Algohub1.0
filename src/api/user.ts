@@ -29,13 +29,6 @@ export const userLoginService = (Auth: any)=>{
         // console.log("登录失败", error.response.data.message);
         ElMessage.error(error.response.data.message);
     });
-    // const response = request.post('/login', {}, {
-    //     headers: {
-    //         'Authorization': Auth // 设置正确的Authorization头
-    //     }
-    // })
-    // console.log("response",response)
-    // return response
 }
 //提供调用退出登录接口的函数
 export const userLogoutService = ()=>{
@@ -57,20 +50,13 @@ export const userListService = (offset:any,limit:any)=>{
 }
 //修改个人信息
 export const userInfoUpdateService = (username:string,userInfoData:any)=>{
-    console.log("userInfoData",userInfoData)
+    // console.log("userInfoData",userInfoData)
    return request.put(`/user/${username}`,userInfoData)
 }
 
 //修改头像
 export const userAvatarUpdateService = (username:string, avatarFile: File) => {
-    // 创建一个FormData对象并添加文件
-    // const formData = new FormData();
-    // formData.append('avatar', avatarFile);
-    // return request.put(`/user/${username}/avatar`, formData,{
-    //     headers: {
-    //         'Content-Type': 'multipart/form-data' // 设置正确的Content-Type
-    //     }
-    // });
+
     console.log("avatarFile",avatarFile)
     return request.put(`/user/${username}/avatar`, avatarFile, {
         headers: {

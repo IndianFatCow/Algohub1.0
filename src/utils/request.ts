@@ -20,7 +20,13 @@ const instance = axios.create({
     }
   ],
     transformRequest: [
-    (data) => {
+    (data,headers) => {
+    // 如果是 FormData，就直接返回，不做 stringify
+      if (data instanceof File) {
+        // 注意：有些老浏览器需要手动 delete headers['Content-Type']
+        // delete headers['Content-Type']
+        return data
+      }
         return JSONBig({ useNativeBigInt: true }).stringify(data); // 自动将大整数转为字符串
     }
   ]

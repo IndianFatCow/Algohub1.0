@@ -63,7 +63,7 @@ const routes = [
                 props: route => ({ searchQuery: route.query.q || '' })
                 },
                 {path: '/questionDetail/:id', component: questionDetail},
-                {path: '/profile', component: profile},
+                // {path: '/profile', component: profile},
                 {path: '/profile/:username', component: profile},
                 {path: '/qa', component: qa},
                 {path: '/visual-algo', component: visualAlgo}      

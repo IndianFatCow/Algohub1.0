@@ -20,7 +20,7 @@
               type="primary"
               @click="subscribeChoice"
             >{{ isFollowed ? '已关注' : '+ 关注' }}</el-button>
-            <el-button size="mini" @click="onMessage">私信</el-button>
+            <el-button size="mini" @click="goprofile">查看主页</el-button>
           </div>
         </div>
         <!-- 触发区域：始终可见的头像 & 昵称 -->
@@ -42,37 +42,36 @@
   import type { userInfo } from '@/lib/types'
   import { checkSubscribe,subscribeUser,unsubscribeUser} from '@/api/subscribe'
   import { useUserInfoStore } from '@/stores/userInfo'
-import { User } from '@icon-park/vue-next'
+  import { User } from '@icon-park/vue-next'
+  import { chageAvatarUrl } from '@/api/user'
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
   const isFollowed = ref(true)
   const props = defineProps<{
     user: userInfo
   }>()
-  const emit = defineEmits<{
-    (e: 'follow', username: string): void
-    (e: 'message', username: string): void
-  }>()
+
   onMounted( () => {
     checkSubscribe(props.user.username).then((res) => {
-      console.log(res)
+      // console.log(res)
+      console.log(props.user.username)
       isFollowed.value = res.data
     })
   })
   // 头像 URL 计算
   const avatarUrl = computed(() =>
-    props.user.avatar !== 'abandoned' ? props.user.avatar : defaultAvatar
+   {  
+    if(!props.user.avatar){
+      return defaultAvatar
+    }
+    const url=props.user.avatar === 'abandoned' ?defaultAvatar :props.user.avatar ;
+    console.log(url)
+    return chageAvatarUrl(url)
+   }
   )
-  
-  // 点击关注
-  function onFollow() {
-    emit('follow', props.user.username)
-  }
-  
-  // 点击私信
-  function onMessage() {
-    emit('message', props.user.username)
-  }
+
   // 关注
-const subscribeChoice =async () => {//关注
+const subscribeChoice =async () => {
     if(isFollowed.value){
       console.log("取消关注")
        await unSubscribe()
@@ -97,11 +96,11 @@ const unSubscribe =async () => {// 取消关注
     }
 
 }
-const subscribe =async () => {
+const subscribe =async () => {//关注
     if (useUserInfoStore().$state.isLogin) {
-      console.log(props.user.username)
+      // console.log(props.user.username)
         const res =await subscribeUser(props.user.username)
-        console.log(res)
+        // console.log(res)
           ElMessage({
               message: res.message,
               type: 'success'
@@ -113,6 +112,11 @@ const subscribe =async () => {
         ElMessage.error("请先登录！")
     }
 
+}
+const goprofile = () => {//跳转个人主页
+  // console.log(props.user.username)
+  router.push(`/profile/${props.user.username}`)
+  location.reload()
 }
   </script>
   

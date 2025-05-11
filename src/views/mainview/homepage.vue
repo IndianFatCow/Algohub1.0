@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import {ElMessage, ElButton, ElInput, ElAvatar, ElDropdown, ElDropdownItem, ElDropdownMenu, ElContainer, ElHeader, ElMain, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElCard } from 'element-plus';
 import {
     Management,
@@ -14,16 +14,20 @@ import {
     Menu,
     Search,
 } from '@element-plus/icons-vue'
-// import { useAuthStore } from '@/store/store';
-// import { useTokenStore } from '@/store/token';
-// // import { userLogoutService } from '@/api/user';
-// import { useUserInfoStore } from '@/stores/userInfo';
+
+
+import { useUserInfoStore } from '@/stores/userInfo';
 // //头像条目点击后的处理
 import { useRouter } from 'vue-router'
+import { computed } from 'vue';
 const router = useRouter();
 // const authStore = useAuthStore();
 // const tokenStore = useTokenStore()
-// const userInfoStore = useUserInfoStore();
+const profilePath = computed(() => `/profile/${useUserInfoStore().userinfo.username}`);
+import miniCenter from './userCenter/miniCenter.vue';
+
+
+
 
 const searchText = ref('');
 const searchType = ref('problems'); // 默认搜索类型为用户
@@ -49,7 +53,6 @@ const handleSearch = () => {
   }
 };
 
-import miniCenter from './userCenter/miniCenter.vue';
 </script>
 <template>
   <el-container class="layout">
@@ -60,18 +63,11 @@ import miniCenter from './userCenter/miniCenter.vue';
           <el-menu-item index="/show">Algohub</el-menu-item>
           <el-menu-item index="/home">首页</el-menu-item>
           <el-menu-item index="/question-bank">题库</el-menu-item>
-          <el-menu-item index="/profile">个人主页</el-menu-item>
+          <el-menu-item :index=profilePath>个人主页</el-menu-item>
           <el-menu-item index="/qa">问答</el-menu-item>
           <!-- <el-menu-item index="/visual-algo">Visual-algo</el-menu-item> -->
         </el-menu>
       </div>
-      <!-- <div class="nav-center">
-        <el-input placeholder="查找题目文章动态" class="search-bar">
-          <template #append>
-            <el-button>搜索</el-button>
-          </template>
-        </el-input>
-      </div> -->
 
       <div class="nav-center">
         <el-input 
@@ -167,11 +163,12 @@ import miniCenter from './userCenter/miniCenter.vue';
   min-height: 100%;
   padding: 16px;          /* 可选：给内容区留点内边距 */
   box-sizing: border-box;
+  overflow-y: auto;
 }
 /* 新增：全局样式覆盖 el-main */
 :deep(.el-main) {
   /* height: calc(100vh - 60px); 减去 header 的高度（假设 header 高度为 60px） */
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }

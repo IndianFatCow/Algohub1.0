@@ -30,7 +30,7 @@ export interface userInfo {
     company: string, // 新增字段
     location: string, // 保持不变，但注意实际用途可能是显示用户的地理位置
     profile_url: string, // 新增字段，用于外部个人资料页面链接
-
+    ip_address: string
     // 下面是原结构中存在但在新示例中未提及的字段，保留或移除取决于需求
     experience?: number, // 可选字段
     level?: number, // 可选字段
@@ -75,7 +75,7 @@ export interface Post {
 
 export interface comment {
     ID?: number; // 评论的唯一标识符
-    instanceID?: number; // 实例ID
+    instanceID?: bigint; // 实例ID
     createdAt?: string; // 创建时间
     updatedAt?: string; // 更新时间
     DeletedAt?: string | null; // 删除时间（如果适用）

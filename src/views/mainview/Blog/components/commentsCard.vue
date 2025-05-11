@@ -1,24 +1,18 @@
 <template>
-    <!-- <el-card shadow="always" style="margin-top: 10px;"> -->
-        <div >
+    <el-card shadow="always" style="margin-top: 10px;">
             <Author
             :user="author"
             />
             <!-- 时间 -->
             <div >
-                <p >{{ calculateTime() }}</p>
+                <p style="size: 10px;">{{ calculateTime() }}</p>
             </div>
-        </div>
         <!-- 评论详情信息 -->
         <div >
-            <el-link type="primary">回复 @{{ comments.author }}</el-link>
+            <el-link type="primary" v-if="refer_comment">回复 @{{ comments.author }}</el-link>
             <el-card shadow="hover" style="margin-top: 10px;">
-                <!-- 头像 -->
-                <!-- <img :src="comments.user.url" class="rounded-full h-8 w-8" /> -->
                 <v-md-editor v-model="comments.content" mode="preview"></v-md-editor>
             </el-card>
-
-            <!-- <v-md-editor v-model="comments.commentsContext" mode="preview">pinglun</v-md-editor> -->
         </div>
         <!-- 帖子底部信息 -->
         <hr />
@@ -35,20 +29,13 @@
                 @mouseenter="deleteColor = ['#d0021b', '#ffffff']">
                 <delete theme="two-tone" size="20" :fill="deleteColor" />
             </div>
-            <!-- 回复
+            <!-- 回复 -->
             <div class="cursor-pointer text-center text-md justify-center items-center flex " @click="openCommentsEdit"
                 style="float: left;margin: 30px 10px 20px 0px;" @mouseleave="shareColor = ['#9b9b9b', '#ffffff']"
                 @mouseenter="shareColor = ['#4a90e2', '#ffffff']">
-                <icon-comment style="margin-top: 3px;" theme="two-tone" size="20" :fill="shareColor" />
-            </div> -->
+                <comment style="margin-top: 3px;" theme="two-tone" size="20" :fill="shareColor" />
+            </div>
 
-            <!-- 回复评论 -->
-            <button type="button" style="float: right;" publishBlog @click="openCommentsEdit"
-                @mouseleave="commentsColor = ['#6b7280', '#ffffff']" @mouseenter="commentsColor = ['#e5e7eb', '#ffffff']">
-                回&nbsp;&nbsp; 复 
-                <icon-writing-fluently theme="outline" size="24" :fill="commentsColor"
-                    style="float: right;margin-left: 5px;" />
-            </button>
         </div>
 
         <!-- 评论回复弹出框 -->
@@ -56,8 +43,8 @@
             <h2  style="float: left;width: 100%;">回复@{{ author.nickname }}
             </h2>
             <!-- markdown编辑器 -->
-            <!-- <v-md-editor v-model="commentsC.context" height="80%" :disabled-menus="[]"
-                @upload-image="handleUploadImage"></v-md-editor> -->
+            <v-md-editor v-model="commentsC.context" height="80%" :disabled-menus="[]"
+                @upload-image="handleUploadImage"></v-md-editor>
             <!-- 发布按钮 -->
             <button type="button" style="float: right;" publishBlog @click="sendComments">
                 发 &nbsp;&nbsp; 布 
@@ -65,7 +52,7 @@
                     style="float: right;margin-left: 5px;" />
             </button>
         </el-drawer>
-    <!-- </el-card> -->
+    </el-card>
 </template>
 
 <script lang="ts" setup>
@@ -79,12 +66,14 @@ import { likeResourceService, unlikeResourceService,getLikesCountService,getUser
 import { createCommentService, getCommentsService, getCommentByIdService, updateCommentService, deleteCommentService } from '@/api/comment'
 import { userInfoService } from '@/api/user'
 import Author from './author.vue'
+import { fa } from 'element-plus/es/locales.mjs'
 
 const props = defineProps(['comments','bid'])
 const comments: comment = props.comments
 const deleteColor = ref(['#9b9b9b', '#ffffff'])
 
 const author = ref<any>({})
+const refer_comment = ref(false)
 const refer_author = ref("")
 // 喜欢状态
 const likeState = ref(false)
@@ -99,6 +88,13 @@ if (likeState.value == true) {
     likeMouseEnter.value = likeMouseLeave.value
     likeMouseLeave.value = likeTempColor
 }
+const commentsC = reactive({//存储编辑的评论
+    context: '',
+    source_id: comments.instanceID,
+    source_type: 'comment',
+    refer_id: comments.source_id,
+    refer_type: 'comment',
+})
 
 const shareColor = ref(['#9b9b9b', '#ffffff'])
 const commentsColor = ref(['#6b7280', '#ffffff'])
@@ -109,9 +105,17 @@ onMounted(async() => {
         // 获取评论作者信息
         const res = await userInfoService(comments.author)
         author.value = res.data
+        // console.log("评论作者信息")
+        // console.log(res.data)
+
         //获取点赞状态
         const likeRes = await getUserisLikedService(comments.instanceID.toString(), 'comment')
         likeState.value = likeRes.data
+        refer_comment.value = comments.refer_type == "comment" ? true : false
+        if(comments.refer_type == "comment"){
+            const res = await getCommentByIdService(comments.refer_id.toString())
+            refer_author.value = res.data.author
+        }
     } catch {
         ElNotification({
             title: "请求被拒绝!",
@@ -150,22 +154,15 @@ const toggleLike = async () => {
   }
 
 // 删除评论
-const removeComments = () => {
-//     API({
-//         url: '/removeComments/' + comments.id + "/" + props.bid,
-//         method: 'get'
-//     }).then((res) => {
-//         if (res.data.state == 40001) {
-//             ElMessage({
-//                 message: res.data.message,
-//                 type: 'success'
-//             })
-//             location.reload()
-//         }else{
-//             ElMessage.error(res.data.message)
-//         }
-
-//     })
+const removeComments =async () => {
+    console.log("删除评论");
+    console.log(comments);
+    await deleteCommentService(comments.source_id,comments.instanceID.toString()).then(() => {
+        ElMessage({
+            message: '删除成功.',
+            type: 'success',
+        })
+    }).catch(err => {console.log(err)})
 }
 
 // markdown上传图片
@@ -189,25 +186,17 @@ const handleUploadImage = (event: any, insertImage: any, files: File[]) => {
 }
 
 // 发送评论
-const sendComments = () => {
+const sendComments =async () => {
+    
+    const res =await createCommentService(commentsC)
+    console.log(res);
+    ElMessage({
+        message: '回复成功.',
+        type: 'success',
+    })
+    location.reload()
+    openEditer.value = !openEditer.value
 
-    // commentsC.bid = comments.bid
-    // commentsC.blogUid = comments.commentsUid
-    // commentsC.commentsUid = useUserInfoStore().$state.user.id
-    // commentsC.commentsContext = comments.commentsContext
-
-    // API({
-    //     url: '/addComments',
-    //     method: 'post',
-    //     data: commentsC
-    // }).then((res) => {
-    //     ElMessage({
-    //         message: '回复成功.',
-    //         type: 'success',
-    //     })
-    // }).catch(err => {
-    //     ElMessage.error("服务器除了一点小问题,稍后再试~")
-    // })
 }
 // 计算时间差
 const calculateTime = () => {

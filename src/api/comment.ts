@@ -9,7 +9,7 @@ export const createCommentService = (commentData: any) => {
     return request.post(`/post/${commentData.source_id}/comment`, commentData);
 };
 
-// 查询评论列表
+// 查询文章评论列表
 export const getCommentsService = (post_Id?:string,limit = 10, offset = 0) => {
     // 构建请求参数对象
     const params = {
@@ -20,12 +20,9 @@ export const getCommentsService = (post_Id?:string,limit = 10, offset = 0) => {
     return request.get(`/post/${post_Id}/comment`, { params });
 };
 
-/**
- * 根据ID获取评论详情
- * 评论实例ID
- */
-export const getCommentByIdService = (commentInstanceId:number) => {
-    return request.get(`/comment/${commentInstanceId}`);
+// 查询评论的评论
+export const getCommentByIdService = (postInstanceId:string,commentInstanceId:string) => {
+    return request.get(`/post/${postInstanceId}/comment/${commentInstanceId}`);
 };
 
 /**
@@ -41,6 +38,6 @@ export const updateCommentService = (commentInstanceId:number, commentData:any) 
  * 删除评论
  * @param {number} commentInstanceId - 要删除的评论实例ID
  */
-export const deleteCommentService = (commentInstanceId:number) => {
-    return request.delete(`/comment/${commentInstanceId}`);
+export const deleteCommentService = (postInstanceId:BigInt,commentInstanceId:string) => {
+    return request.delete(`/post/${postInstanceId}/comment/${commentInstanceId}`);
 };

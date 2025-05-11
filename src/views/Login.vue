@@ -6,6 +6,7 @@ import { ElMessage } from 'element-plus'
 const isRegister = ref(false)//true默认显示注册
 const showForgetPwdDialog = ref(false)//忘记密码对话框
 
+
 //忘记密码
 const forgetData = ref({
   username: '',
@@ -23,7 +24,7 @@ const forgetRules = {
     { min: 6, max: 16, message: '请输入6-16位密码', trigger: 'blur' }
   ]
 }
-import { userInfoService, userResetPasswordService } from '@/api/user'
+import { userInfoService, userResetPasswordService,userInfoUpdateService } from '@/api/user'
 
 const submitForgetPwd = async () => {
   const valid = await forgetFormRef.value.validate()
@@ -87,6 +88,7 @@ const register = async () =>{
     if (!valid) {
         return
     }
+    console.log(registerData.value)
     let result = await userRegisterService(registerData.value);
     ElMessage.success(result.msg?result.msg:"注册成功")
     isRegister.value = false
@@ -118,13 +120,11 @@ const login = async () =>{
     token.setToken(restoken.data.data)//根据后台设置token
 
     let res = await userInfoService(registerData.value.username)//获取用户信息;
-    // console.log('token is '+token.$state.token)
+    
     UserInfoStore.setUserInfo(res.data)//设置用户信息
-
-
-
-    // console.log(UserInfoStore.$state)
+    console.log(UserInfoStore.userinfo)
     UserInfoStore.setState({isLogin: true, isAdmin: (res.data.status == 'admin' )?true:false})//设置登录状态
+
     ElMessage.success(restoken.msg?restoken.msg:"登录成功")
 
 
@@ -141,6 +141,7 @@ const clearForm = () => {
         password: '',
         rePassword: '',
         email: '',
+        status: 'user'
     }
 }
 </script>

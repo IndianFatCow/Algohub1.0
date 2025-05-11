@@ -11,8 +11,8 @@
       </el-header>
       <el-main>
 
-        <el-card shadow="always" style="height: 100%" >
-        <div class="scrollable-content" style="height: 80vh; overflow: auto;"
+        <el-card shadow="always" style="height: 110%" >
+        <div class="scrollable-content" style="height: 110vh; overflow: auto;"
           v-loading="blogListLoading"
           v-infinite-scroll="loadMore"
           :infinite-scroll-container="scrollContainer"
@@ -60,9 +60,7 @@
         </el-card>
         
       </el-main>
-      <el-footer>
 
-      </el-footer>
     </el-container>
     <el-aside width="20%"></el-aside>
   </el-container>

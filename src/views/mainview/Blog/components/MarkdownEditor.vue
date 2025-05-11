@@ -87,7 +87,7 @@ if (isChangeEdit.value) {
 }
 
 
-// 发布讨论
+// 发布动态
 const publishBlog = () => {
 
     API({

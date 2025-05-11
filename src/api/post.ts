@@ -42,6 +42,11 @@ export const deletePostService = (id:number) => {
     return request.delete(`/post/${id}`);
 };
 //上传图片
-export const uploadImageService = (file:any,postId?:number) => {
-    return request.post(`/post/${{}}/image`, file);
+export const uploadImageService = (file:File,postId?:number) => {
+    return request.post(`/post/${{postId}}/image`, file, {
+        headers: {
+            'Content-Type': 'image/png',
+          }
+          
+    });
 };
