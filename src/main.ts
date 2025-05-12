@@ -10,8 +10,10 @@ import { createPinia } from 'pinia'
 import { createPersistedState } from 'pinia-plugin-persistedstate'
 
 // v-md-editor Markdown组件
+// @ts-ignore
 import VMdEditor from '@kangc/v-md-editor'
 import '@kangc/v-md-editor/lib/style/base-editor.css'
+// @ts-ignore
 import githubTheme from '@kangc/v-md-editor/lib/theme/github'
 import '@kangc/v-md-editor/lib/theme/style/github.css'
 // highlightjs 核心代码
@@ -31,6 +33,6 @@ pinia.use(persist)
 app.use(ElementPlus)
 app.use(pinia)//管理全局状态
 app.use(router)//管理路由
-app.use(ace)//ace编辑器
+// app.use(ace)//ace编辑器
 app.use(VMdEditor)
 app.mount('#app')

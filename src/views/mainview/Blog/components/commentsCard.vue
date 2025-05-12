@@ -109,10 +109,12 @@ onMounted(async() => {
         // console.log(res.data)
 
         //获取点赞状态
+        // @ts-ignore
         const likeRes = await getUserisLikedService(comments.instanceID.toString(), 'comment')
         likeState.value = likeRes.data
         refer_comment.value = comments.refer_type == "comment" ? true : false
         if(comments.refer_type == "comment"){
+            // @ts-ignore
             const res = await getCommentByIdService(comments.refer_id.toString())
             refer_author.value = res.data.author
         }
@@ -140,10 +142,12 @@ const openCommentsEdit = () => {
 const toggleLike = async () => {
 	try {
 	  if (likeState.value) {
+        // @ts-ignore
 		await unlikeResourceService(comments.instanceID.toString(), 'comment')
 		likeCount.value--
 
 	  } else {
+        // @ts-ignore
 		await likeResourceService(comments.instanceID.toString(), 'comment')
 		likeCount.value++
 	  }
@@ -157,6 +161,7 @@ const toggleLike = async () => {
 const removeComments =async () => {
     console.log("删除评论");
     console.log(comments);
+    // @ts-ignore
     await deleteCommentService(comments.source_id,comments.instanceID.toString()).then(() => {
         ElMessage({
             message: '删除成功.',

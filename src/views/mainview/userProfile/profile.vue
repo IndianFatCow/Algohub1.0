@@ -22,7 +22,7 @@
           :infinite-scroll-disabled="noMore"
           :infinite-scroll-distance="100"
         >
-          <Header :articleCount="articleCount" :user="user" :isUser="isUser" :followingCount="followingCount"></Header>
+          <Header :articleCount="articleCount" :user="user || {} as userInfo" :isUser="isUser" :followingCount="followingCount" :followers-count="followersCount"></Header>
           <!-- 顶部导航栏 -->
           <el-tabs v-model="activeTab" class="tab-container" @tab-change="handleTabChange">
             <el-tab-pane label="动态" name="dynamic"> </el-tab-pane>
@@ -173,8 +173,10 @@ onMounted(async () => {
   .catch(error => console.error('获取 IP 属地失败:', error));
   } else {
     try {
+      // @ts-ignore
       const res = await userInfoService(username)
       user.value = res.data
+      // @ts-ignore
       user.value.avatar = chageAvatarUrl(user.value.avatar)
       console.log('他人信息:', res.data)
     } catch (err) {
@@ -208,9 +210,11 @@ const loadMore = async () => {
 
   const offset = (userPage.value - 1) * pageSize.value
   if (activeTab.value === 'dynamic') {
+    
     const res = await queryPostsService(
       pageSize.value,
       offset,
+      // @ts-ignore
       username 
     )
     const items = res.data.items || []
@@ -226,6 +230,7 @@ const loadMore = async () => {
       message: '获取点赞列表',
       type: 'success',
     })
+    // @ts-ignore
     const res = (await getUserLikesService(username,pageSize.value,offset))as { data: UserLikeResponse }
     // console.log('获取点赞列表:', res.data)
     const likeItems = res.data.items || []
@@ -258,6 +263,7 @@ const loadMore = async () => {
 }
 const followList = ref([])
 const getFollowing = async () => {
+  // @ts-ignore
     const res = await getSubscribeList(username,'user')
     followList.value = res.data.items
     followingCount.value = res.data.totalItems

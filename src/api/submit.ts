@@ -1,14 +1,13 @@
 // 导入request.js请求工具
 import request from '@/utils/request.js';
 
-export function getSubmitList(problem_id?: string, offset: number = 0, limit: number = 100 ) {
-  const params = { offset, limit };
-  if (problem_id !== undefined) {
-      params['problem_id'] = problem_id;
-  }
-  console.log(params)
+export function getSubmitList(problem_id: string, offset: number = 0, limit: number = 100 ) {
   return request.get('/submit/', {
-      params
+    params: {
+      problem_id,
+      offset,
+      limit,
+    },
   });
 }
 export function submitCode(problem_id: string, code: string, language: string) {

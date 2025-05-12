@@ -113,6 +113,7 @@ onMounted(async () => {
     // console.log(userRes.data.Items[0])
     postUser.value = userRes.data.Items[0]
     console.log(postUser.value)
+    // @ts-ignore
     if(postUser.value && postUser.value.avatar !== "abandoned")postUser.value.avatar = chageAvatarUrl(postUser.value.avatar)
     //获取评论数
     const commentRes = await getCommentsService(post.instanceID.toString(), 1)

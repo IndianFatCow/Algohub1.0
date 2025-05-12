@@ -53,7 +53,7 @@
         </div>
 
         <!-- markdown编辑器 -->
-        <v-md-editor v-model="blogContext.context" height="80%" :disabled-menus="[]"
+        <v-md-editor v-model="blogContext.content" height="80%" :disabled-menus="[]"
             @upload-image="handleUploadImage"></v-md-editor>
     </div>
 </template>
@@ -90,19 +90,19 @@ if (isChangeEdit.value) {
 // 发布动态
 const publishBlog = () => {
 
-    API({
-        url: '/uploadBlog',
-        method: 'post',
-        data: blogContext
-    }).then((res) => {
-        if (res.data.state == 40001) {
-            location.reload()
-            ElMessage({
-                message: '发布成功!',
-                type: 'success'
-            })
-        }
-    })
+    // API({
+    //     url: '/uploadBlog',
+    //     method: 'post',
+    //     data: blogContext
+    // }).then((res) => {
+    //     if (res.data.state == 40001) {
+    //         location.reload()
+    //         ElMessage({
+    //             message: '发布成功!',
+    //             type: 'success'
+    //         })
+    //     }
+    // })
 }
 
 // 超出限制
@@ -112,43 +112,43 @@ const exceed = (files: File[]) => {
 // 选择了文件
 const handleChange = (file: UploadFile) => {
 
-    let param = new FormData()
-    param.append('file', file.raw)
-    API({
-        url: '/uploadImg',
-        headers: headers,
-        method: 'post',
-        data: param
-    }).then((res) => {
-        blogContext.faceImage = res.data
-        ElMessage({
-            message: '封面上传成功.',
-            type: 'success',
-        })
-    }).catch(err => {
-        console.log(err);
-    })
+    // let param = new FormData()
+    // param.append('file', file.raw)
+    // API({
+    //     url: '/uploadImg',
+    //     headers: headers,
+    //     method: 'post',
+    //     data: param
+    // }).then((res) => {
+    //     blogContext.faceImage = res.data
+    //     ElMessage({
+    //         message: '封面上传成功.',
+    //         type: 'success',
+    //     })
+    // }).catch(err => {
+    //     console.log(err);
+    // })
 }
 
 // 移除文件
 const handleRemove = (file: UploadFile) => {
     let param = new FormData()
 
-    param.append('fileName', blogContext.faceImage)
+    // param.append('fileName', blogContext.faceImage)
 
 
-    API({
-        url: '/deleteImg',
-        method: 'post',
-        headers: headers,
-        data: param
-    }).then((res) => {
-        fileList.value = []
-        ElMessage({
-            message: '删除成功.',
-            type: 'success',
-        })
-    })
+    // API({
+    //     url: '/deleteImg',
+    //     method: 'post',
+    //     headers: headers,
+    //     data: param
+    // }).then((res) => {
+    //     fileList.value = []
+    //     ElMessage({
+    //         message: '删除成功.',
+    //         type: 'success',
+    //     })
+    // })
 
 }
 // 显示略缩图
@@ -188,17 +188,17 @@ const handleUploadImage = (event: any, insertImage: any, files: File[]) => {
     console.log(files[0]);
 
 
-    API({
-        url: '/uploadImg',
-        data: formData,
-        method: 'post',
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }).then((res) => {
-        console.log(res);
-        insertImage({
-            url: res.data
-        })
-    })
+    // API({
+    //     url: '/uploadImg',
+    //     data: formData,
+    //     method: 'post',
+    //     headers: { 'Content-Type': 'multipart/form-data' }
+    // }).then((res) => {
+    //     console.log(res);
+    //     insertImage({
+    //         url: res.data
+    //     })
+    // })
 
 }
 

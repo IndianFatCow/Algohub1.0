@@ -133,6 +133,7 @@ routeSearch()
   total_size.value = 1;
 // 修改 tag 字段
   result.data.tag = result.data.tag 
+  // @ts-ignore
       ? result.data.tag.split(',').map(tag => tag.trim()) 
       : [];
   // console.log(result.data.tag)

@@ -60,6 +60,7 @@ const routes = [
                 { path: '/blogDetail/:id', component: blogDetail },
                 {path: '/question-bank', component: questionBank ,
                 // 将查询参数 q 作为 props.searchQuery 传入
+                // @ts-ignore
                 props: route => ({ searchQuery: route.query.q || '' })
                 },
                 {path: '/questionDetail/:id', component: questionDetail},

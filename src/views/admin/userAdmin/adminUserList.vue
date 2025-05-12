@@ -85,7 +85,7 @@ const showMsg = (state: number, message: string) => {
 
                     <th class="flex gap-3 px-6 py-4 font-normal text-gray-900">
                         <div class="relative h-10 w-10">
-                            <img class="h-full w-full rounded-full object-cover object-center" :src="user.url" alt="" />
+                            <img class="h-full w-full rounded-full object-cover object-center" :src="user.avatar" alt="" />
                             <!-- 在线提示绿点 -->
                             <!-- <span class="absolute right-0 bottom-0 h-2 w-2 rounded-full bg-green-400 ring ring-white"></span> -->
                         </div>
@@ -102,27 +102,25 @@ const showMsg = (state: number, message: string) => {
                     <td class="px-4  py-4">{{ user.location }}</td>
                     <td class="px-4  py-4">{{ user.school }}</td>
                     <td class="px-4  py-4">
-                        <el-tag class="ml-2" v-for="tags in JSON.parse(user.tag)" type="info" style="margin-left: 5px;">{{
-                            tags }}
-                        </el-tag>
+  
                     </td>
                     <td class="px-6 py-4">{{ user.gender }}</td>
                     <td class="px-6 py-4">{{ user.easyResolve }}</td>
-                    <td class="px-6 py-4">{{ user.meddleResolve }}</td>
+                    <!-- <td class="px-6 py-4">{{ user.meddleResolve }}</td> -->
                     <td class="px-6 py-4">{{ user.hardResolve }}</td>
                     <td class="px-6 py-4">{{ user.nightmareResolve }}</td>
                     <td class="px-6 py-4">
-                        <el-tag class="ml-2" :type="user.role == 'admin' ? 'success' : 'primary'"
-                            style="margin-left: 5px;">{{ user.role }}</el-tag>
+                        <el-tag class="ml-2" :type="user.status == 'admin' ? 'success' : 'primary'"
+                            style="margin-left: 5px;">{{ user.status }}</el-tag>
 
                     </td>
                     <td class="px-6 py-4">{{ user.rank }}</td>
                     <td class="px-6 py-4">{{ user.fans }}</td>
                     <td class="px-6 py-4">{{ user.subscribe }}</td>
-                    <td class="px-6 py-4">{{ user.sign }}</td>
+                    <!-- <td class="px-6 py-4">{{ user.sign }}</td> -->
                     <td class="px-6 py-4">
-                        <el-button :type="user.ban ? 'success' : 'danger'" @click="banUser(user.id, user.ban)">{{ user.ban ?
-                            '解禁' : '封禁' }}</el-button>
+                        <!-- <el-button :type="user.ban ? 'success' : 'danger'" @click="banUser(user.id, user.ban)">{{ user.ban ?
+                            '解禁' : '封禁' }}</el-button> -->
                     </td>
                 </tr>
 

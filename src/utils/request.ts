@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from  '@/store/store'
 import { useTokenStore } from '@/store/token'//token存储
+// @ts-ignore
 import JSONBig from 'json-bigint';
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = '/v1';

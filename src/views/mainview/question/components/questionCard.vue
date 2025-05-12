@@ -27,12 +27,19 @@ const questions = reactive({
           totalAttempt: 0,
       },
 })
-const solution = ref([])
+interface SolutionItem {
+  ID?: number;
+  data_test: string;
+  result_test: string;
+}
+
+const solution = ref<SolutionItem[]>([])
 
 
 const showSlotion = async () => {
     // 从pina加载题目
   questions.question = quesitonStore.$state.currentChoice
+  // @ts-ignore
   let res = await getSolution(questions.unique_id)
   solution.value = res.data.items
 

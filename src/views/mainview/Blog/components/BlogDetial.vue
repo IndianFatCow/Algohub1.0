@@ -218,6 +218,7 @@ let comments = reactive<comment>({
 })
 const getBlogDetial = async () => {
     // console.log(postId);
+    // @ts-ignore
     const res = await getPostByIdService(postId)
     // console.log(res.data);
     blog.value = res.data
@@ -241,10 +242,12 @@ getBlogDetial()
 
 const getUser =async () =>{
     // console.log(blog);
+    // @ts-ignore
   const res =await SearchUserService(blog !==null ? blog?.value.author:'')
 //   console.log(res.data);
   author.value = res.data.Items[0]
 //   console.log(author.value );
+// @ts-ignore
   if(author.value !== null)author.value.avatar = chageAvatarUrl(author.value.avatar)
 }
 const getLikesCount = async () => {
@@ -253,6 +256,7 @@ const getLikesCount = async () => {
     // likesCount.value= res.data.totalItems
         //是否点赞
     // console.log(post)
+    // @ts-ignore
     const Res = await getUserisLikedService(postId, 'post')
     // console.log(Res)
     likeState.value = Res.data
@@ -262,6 +266,7 @@ const getLikesCount = async () => {
     likeMouseEnter.value = likeMouseLeave.value
     likeMouseLeave.value = likeTempColor
     }
+    // @ts-ignore
     const likeRes = await getLikesCountService(postId, 'post')
     likeCount.value = likeRes.data.totalItems
 }
@@ -271,6 +276,7 @@ const getLikesCount = async () => {
 const removeBlog = () => {
     const res = confirm("确定删除吗？")
     if (res) {
+        // @ts-ignore
         deletePostService(postId).then(() => {
             ElMessage.success("删除成功")
             router.push('/')
@@ -289,9 +295,11 @@ const openCommentsEdit = () => {
 
 // 得到评论列表
 const getCommentsList =async () => {
+    // @ts-ignore
     const res = await getCommentsService(postId)
     commentCount.value = res.data.totalItems
     //  过滤掉评论的评论
+    // @ts-ignore
     commentsList.value =  res.data.items.filter(item => item.refer_type !== 'comment');
     console.log(commentsList.value);
     loadBlogDone.value = true
@@ -301,10 +309,12 @@ const getCommentsList =async () => {
 const toggleLike = async () => {
 	try {
 	  if (likeState.value) {
+        // @ts-ignore
 		await unlikeResourceService(postId, 'post')
 		likeCount.value--
 
 	  } else {
+        // @ts-ignore
 		await likeResourceService(postId, 'post')
 		likeCount.value++
 	  }
@@ -319,8 +329,10 @@ const toggleLike = async () => {
 const sendComments =async () => {
     // 评论对象
     comments.refer_type = "post"
+    // @ts-ignore
     comments.refer_id = BigInt(postId)
     //  源ID
+    // @ts-ignore
     comments.source_id = BigInt(postId)
     comments.source_type = "post"
     comments.author = useUserInfoStore().userinfo.username
@@ -345,6 +357,7 @@ const handleUploadImage = async (event: any, insertImage: any, files: File[]) =>
         type: 'success'
     })
     let URL  = chageAvatarUrl(res.data.sub_url)
+    // @ts-ignore
     imgUrlList.value.push(URL)
     console.log(imgUrlList.value);
 }

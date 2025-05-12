@@ -85,6 +85,7 @@ const unSubscribe =async () => {// 取消关注
     if (useUserInfoStore().$state.isLogin) {
         const res =await unsubscribeUser(props.user.username)
             ElMessage({
+              // @ts-ignore
                 message: res.message,
                 type: 'success'
             })
@@ -102,6 +103,7 @@ const subscribe =async () => {//关注
         const res =await subscribeUser(props.user.username)
         // console.log(res)
           ElMessage({
+            // @ts-ignore
               message: res.message,
               type: 'success'
           })
